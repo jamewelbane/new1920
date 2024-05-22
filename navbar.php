@@ -30,7 +30,7 @@
 										<li><a href="checkout.html">Check Out</a></li>
 										<li><a href="contact.html">Contact</a></li>
 										<li><a href="news.html">News</a></li>
-										<li><a href="shop.html">Shop</a></li>
+										<li><a href="shop.php">Shop</a></li>
 									</ul>
 								</li>
 								<li><a href="news.html">News</a>
@@ -40,7 +40,7 @@
 									</ul>
 								</li>
 								<li><a href="contact.html">Contact</a></li>
-								<li><a href="shop.html">Shop</a>
+								<li><a href="shop.php">Shop</a>
 									<ul class="sub-menu">
 										<li><a href="shop.html">Shop</a></li>
 										<li><a href="checkout.html">Check Out</a></li>

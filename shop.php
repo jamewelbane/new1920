@@ -29,7 +29,7 @@
 	<!-- main style -->
 	<link rel="stylesheet" href="assets/css/main.css">
 	<!-- responsive -->
-	<!-- <link rel="stylesheet" href="assets/css/responsive.css"> -->
+	<link rel="stylesheet" href="assets/css/responsive.css">
 
 </head>
 
