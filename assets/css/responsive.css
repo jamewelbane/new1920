@@ -109,7 +109,9 @@
 	    max-width: 150px;
 	}
 	
-
+	.mean-container .mean-bar {
+	    z-index: 2;
+	}
 
 	.responsive-menu-wrap {
 	    position: absolute;
@@ -182,6 +184,8 @@
 	}
 
 }
+
+
 
 /* Mobile Layout: 320px. */
 @media only screen and (max-width: 767px) {
