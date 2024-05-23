@@ -1,17 +1,30 @@
+<?php
+session_start();
+require_once '../database/connection.php';
+require("function/check-login.php");
+$isLoggedIn = 0;
+if (!check_login_user_universal($link)) {
+
+	$isLoggedIn = 0;
+} else {
+	$verifiedUID = $_SESSION['userid'];
+	$isLoggedIn = 1;
+}
+  
+
+?>
 
 <html lang="en">
-<?php include 'head.html'; ?> 
+<?php include 'head.html'; ?>
+
 <body>
+
+	<?php 
 	
-	<!--PreLoader-->
-    <div class="loader">
-        <div class="loader-inner">
-            <div class="circle"></div>
-        </div>
-    </div>
-    <!--PreLoader Ends-->
-	
-	<?php include("navbar.php") ?>
+	// include 'html/pre-loader.html';
+	include("navbar.php");
+
+	?>
 
 	<!-- search area -->
 	<div class="search-area">
@@ -31,7 +44,7 @@
 		</div>
 	</div>
 	<!-- end search arewa -->
-	
+
 	<!-- breadcrumb-section -->
 	<div class="breadcrumb-section breadcrumb-bg">
 		<div class="container">
@@ -213,13 +226,13 @@
 		</div>
 	</div>
 	<!-- end footer -->
-	
+
 	<!-- copyright -->
 	<div class="copyright">
 		<div class="container">
 			<div class="row">
 				<div class="col-lg-6 col-md-12">
-					<p>Copyrights &copy; 2019 - <a href="https://imransdesign.com/">Imran Hossain</a>,  All Rights Reserved.</p>
+					<p>Copyrights &copy; 2019 - <a href="https://imransdesign.com/">Imran Hossain</a>, All Rights Reserved.</p>
 				</div>
 				<div class="col-lg-6 text-right col-md-12">
 					<div class="social-icons">
@@ -236,8 +249,19 @@
 		</div>
 	</div>
 	<!-- end copyright -->
-	
-	
-<?php require 'injectables.html'; ?>
+
+
+	<?php require 'injectables.html'; ?>
+
+	<script>
+		window.onload = function() {
+			var cartIcon = document.getElementById("cart");
+			if (cartIcon) {
+				cartIcon.style.color = "#F28123";
+			}
+		};
+	</script>
+
 </body>
+
 </html>

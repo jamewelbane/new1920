@@ -1,7 +1,16 @@
 <?php
-
+session_start();
 require_once '../database/connection.php';
+require("function/check-login.php");
 
+$isLoggedIn = 0;
+if (!check_login_user_universal($link)) {
+
+	$isLoggedIn = 0;
+} else {
+	$verifiedUID = $_SESSION['userid'];
+	$isLoggedIn = 1;
+}
 
 $query_categories = "SELECT CategoryID, CategoryName FROM category";
 $result_categories = mysqli_query($link, $query_categories);
@@ -36,6 +45,7 @@ while ($row = mysqli_fetch_assoc($result_products)) {
 
 
 
+
 <html lang="en">
 
 <?php include("head.html"); ?>
@@ -65,15 +75,14 @@ while ($row = mysqli_fetch_assoc($result_products)) {
 
 <body>
 
-	<!--PreLoader-->
-	<div class="loader">
-		<div class="loader-inner">
-			<div class="circle"></div>
-		</div>
-	</div>
-	<!--PreLoader Ends-->
 
-	<?php include("navbar.php"); ?>
+
+	<?php
+
+	include 'html/pre-loader.html';
+	include("navbar.php");
+
+	?>
 
 	<!-- search area -->
 	<div class="search-area">
@@ -150,7 +159,7 @@ while ($row = mysqli_fetch_assoc($result_products)) {
 									<?= $product['FormattedPrice'] ?>
 								<?php endif; ?>
 							</p>
-							<a href="cart.html" class="cart-btn" data-toggle="modal" data-target="#loginModal"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
+							<a href="cart.html" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
 						</div>
 					</div>
 				<?php endforeach; ?>
@@ -190,6 +199,16 @@ while ($row = mysqli_fetch_assoc($result_products)) {
 	<!-- end copyright -->
 
 	<?php include 'injectables.html'; ?>
+
+
+	<script>
+		window.onload = function() {
+			var shopItem = document.getElementById("shop");
+			if (shopItem) {
+				shopItem.classList.add("current-list-item");
+			}
+		};
+	</script>
 
 </body>
 

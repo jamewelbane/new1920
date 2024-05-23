@@ -1,5 +1,3 @@
-
-
 	<!-- header -->
 	<div class="top-header-area" id="sticker">
 		<div class="container">
@@ -8,8 +6,8 @@
 					<div class="main-menu-wrap">
 						<!-- logo -->
 						<div class="site-logo">
-							<a href="../index">
-								<img src="../assets/img/logo.png" alt="">
+							<a href="index">
+								<img src="assets/img/logo.png" alt="">
 							</a>
 						</div>
 						<!-- logo -->
@@ -17,14 +15,14 @@
 						<!-- menu start -->
 						<nav class="main-menu">
 							<ul>
-								<li><a href="../index">Home</a>
+								<li class="current-list-item"><a href="#">Home</a>
 
 								</li>
-								<li><a href="about.html">About</a></li>
+								<li><a href="#">About</a></li>
 
 
-								<li><a href="contact.html">Contact</a></li>
-								<li id="shop"><a href="shop">Shop</a>
+								<li><a href="#">Contact</a></li>
+								<li id="shop"><a href="user/shop">Shop</a>
 								</li>
 								<li>
 									<div class="header-icons">
@@ -32,7 +30,7 @@
 										?>
 											<a class="login-icon">
 												<i class="fas fa-sign-out-alt"></i>
-												<a class="mobile-hide shopping-cart" href="cart"><i id="cart" class="fas fa-shopping-cart"></i></a>
+												<a class="mobile-hide shopping-cart" href="user/cart"><i id="cart" class="fas fa-shopping-cart"></i></a>
 											</a>
 										<?php
 										} else { ?>
@@ -50,7 +48,7 @@
 						</nav>
 						<?php if ($isLoggedIn === 1) {
 						?>
-							<a class="mobile-show shopping-cart" href="cart"><i id="cart" class="fas fa-shopping-cart"></i></a>
+							<a class="mobile-show shopping-cart" href="cart"><i id="user/cart" class="fas fa-shopping-cart"></i></a>
 						<?php
 						} else { ?>
 							<a class="mobile-show login-icon" data-toggle="modal" data-target="#loginModal"><i class="fas fa-user"></i></a>
@@ -66,20 +64,3 @@
 		</div>
 	</div>
 	<!-- end header -->
-
-
-	<!-- modal -->
-	<?php
-
-	
-
-	if ($isLoggedIn === 1) {
-		// Code to execute if user is logged in
-	} else {
-		include("../index-resources/modal/signup-modal.html");
-		include("../index-resources/modal/user-login-modal.html");
-		include("../index-resources/modal/admin-login-modal.html");
-	}
-	?>
-
-	<!-- modal end -->
