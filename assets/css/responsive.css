@@ -172,10 +172,21 @@
 	a.mobile-hide.search-bar-icon {
 	    display: none!important;
 	}
+	a.mobile-hide.login-icon {
+	    display: none!important;
+	}
 	.mobile-show {
 		display: block!important;
 	}
 	a.mobile-show.search-bar-icon {
+	    position: absolute;
+	    right: 100px;
+	    top: 22px;
+	    z-index: 999;
+	    color: #fff;
+	}
+
+	a.mobile-show.login-icon {
 	    position: absolute;
 	    right: 60px;
 	    top: 22px;
@@ -522,16 +533,28 @@
 	a.mobile-hide.search-bar-icon {
 	    display: none!important;
 	}
+	a.mobile-hide.login-icon {
+	    display: none!important;
+	}
 	.mobile-show {
 		display: block!important;
 	}
 	a.mobile-show.search-bar-icon {
-	    position: absolute;
-	    right: 60px;
-	    top: 22px;
-	    z-index: 999;
-	    color: #fff;
+		position: absolute;
+		right: 100px; /* Adjust this value to fit your layout */
+		top: 22px;
+		z-index: 999;
+		color: #fff;
 	}
+	
+	a.mobile-show.login-icon {
+		position: absolute;
+		right: 60px;
+		top: 22px;
+		z-index: 999;
+		color: #fff;
+	}
+	
 }
 /* Wide Mobile Layout: 480px. */
 @media only screen and (min-width: 480px) and (max-width: 767px) { 
