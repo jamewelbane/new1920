@@ -30,6 +30,12 @@ while ($row = mysqli_fetch_assoc($result_products)) {
 	// Format price with comma
 	$row['FormattedPrice'] = '₱' . number_format($row['Price'], 2); // 2 decimal places
 
+	$formatted_discount = rtrim(rtrim(number_format($discount, 2), '0'), '.');
+
+	if (strpos($formatted_discount, '.') === false) {
+		$formatted_discount = rtrim($formatted_discount, '.');
+	}
+
 	// Calculate discounted price
 	if ($row['onDiscount']) {
 		$discountedPrice = $row['Price'] - ($row['Price'] * ($row['Discount'] / 100));
@@ -145,6 +151,12 @@ function generateToken($product_id, $secret_key)
 			<div class="row product-lists">
 				<?php foreach ($products as $product) : ?>
 					<?php
+					$discount = $product['Discount'];
+					$formatted_discount = rtrim(rtrim(number_format($discount, 2), '0'), '.');
+					
+					if (strpos($formatted_discount, '.') === false) {
+						$formatted_discount = rtrim($formatted_discount, '.');
+					}
 					$product_id = $product['product_id'];
 					$token = generateToken($product_id, $secret_key);
 					?>
@@ -154,7 +166,7 @@ function generateToken($product_id, $secret_key)
 								<span class="new" style="margin-left: 5px">new</span>
 							<?php endif; ?>
 							<?php if ($product['onDiscount']) : ?>
-								<span class="discount" style="margin-left: 25px"><?= htmlspecialchars($product['Discount']) ?>% Off</span>
+								<span class="discount" style="margin-left: 25px"><?= htmlspecialchars($formatted_discount) ?>% Off</span>
 							<?php endif; ?>
 							<div class="product-image">
 								<a href="single-product.php?product_id=<?= urlencode($product_id) ?>&token=<?= urlencode($token) ?>"><img src="<?= htmlspecialchars($product['ImageURL']) ?>" alt=""></a>
