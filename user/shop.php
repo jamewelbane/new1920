@@ -30,11 +30,9 @@ while ($row = mysqli_fetch_assoc($result_products)) {
 	// Format price with comma
 	$row['FormattedPrice'] = '₱' . number_format($row['Price'], 2); // 2 decimal places
 
-	$formatted_discount = rtrim(rtrim(number_format($discount, 2), '0'), '.');
+	
 
-	if (strpos($formatted_discount, '.') === false) {
-		$formatted_discount = rtrim($formatted_discount, '.');
-	}
+
 
 	// Calculate discounted price
 	if ($row['onDiscount']) {
