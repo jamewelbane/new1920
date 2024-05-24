@@ -33,7 +33,7 @@
 													<form id="logoutForm" method="POST" action="user/function/logout.php">
 													</form>
 												</i>
-												<a class="mobile-hide shopping-cart" href="user/cart"><i id="cart" class="fas fa-shopping-cart"></i></a>
+												<a class="mobile-hide shopping-cart" href="user/503-cart"><i id="cart" class="fas fa-shopping-cart"></i></a>
 											</a>
 										<?php
 										} else { ?>
@@ -51,7 +51,7 @@
 						</nav>
 						<?php if ($isLoggedIn === 1) {
 						?>
-							<a class="mobile-show shopping-cart" href="cart"><i id="user/cart" class="fas fa-shopping-cart"></i></a>
+							<a class="mobile-show shopping-cart" href="user/503-cart"><i id="cart" class="fas fa-shopping-cart"></i></a>
 						<?php
 						} else { ?>
 							<a class="mobile-show login-icon" data-toggle="modal" data-target="#loginModal"><i class="fas fa-user"></i></a>

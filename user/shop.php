@@ -40,6 +40,13 @@ while ($row = mysqli_fetch_assoc($result_products)) {
 }
 
 
+$secret_key = 'vS8/yDzI70nsY0kOCcHxew==';
+
+function generateToken($product_id, $secret_key)
+{
+	return hash_hmac('sha256', $product_id, $secret_key);
+}
+
 ?>
 
 
@@ -137,26 +144,30 @@ while ($row = mysqli_fetch_assoc($result_products)) {
 
 			<div class="row product-lists">
 				<?php foreach ($products as $product) : ?>
-					<div class="col-lg-4 col-md-6 text-center <?= $product['CategoryID'] ?>">
+					<?php
+					$product_id = $product['product_id'];
+					$token = generateToken($product_id, $secret_key);
+					?>
+					<div class="col-lg-4 col-md-6 text-center <?= htmlspecialchars($product['CategoryID']) ?>">
 						<div class="single-product-item">
 							<?php if ($product['isNew']) : ?>
 								<span class="new" style="margin-left: 5px">new</span>
 							<?php endif; ?>
 							<?php if ($product['onDiscount']) : ?>
-								<span class="discount" style="margin-left: 25px"><?= $product['Discount'] ?>% Off</span>
+								<span class="discount" style="margin-left: 25px"><?= htmlspecialchars($product['Discount']) ?>% Off</span>
 							<?php endif; ?>
 							<div class="product-image">
-								<a href="single-product.php"><img src="<?= $product['ImageURL'] ?>" alt=""></a>
+								<a href="single-product.php?product_id=<?= urlencode($product_id) ?>&token=<?= urlencode($token) ?>"><img src="<?= htmlspecialchars($product['ImageURL']) ?>" alt=""></a>
 							</div>
-							<h3><?= $product['prod_name'] ?></h3>
+							<h3><?= htmlspecialchars($product['prod_name']) ?></h3>
 							<p class="product-price">
-								<span><?= $product['CategoryName'] ?></span>
+								<span><?= htmlspecialchars($product['CategoryName']) ?></span>
 								<?php if ($product['onDiscount']) : ?>
-									<span class="old-price"><?= $product['FormattedPrice'] ?></span>
-									<?= $product['DiscountedPrice'] ?>
+									<span class="old-price"><?= htmlspecialchars($product['FormattedPrice']) ?></span>
+									<?= htmlspecialchars($product['DiscountedPrice']) ?>
 								<?php else : ?>
 									<span>&nbsp;</span>
-									<?= $product['FormattedPrice'] ?>
+									<?= htmlspecialchars($product['FormattedPrice']) ?>
 								<?php endif; ?>
 							</p>
 							<a href="cart.html" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
@@ -164,6 +175,7 @@ while ($row = mysqli_fetch_assoc($result_products)) {
 					</div>
 				<?php endforeach; ?>
 			</div>
+
 
 
 
@@ -182,15 +194,15 @@ while ($row = mysqli_fetch_assoc($result_products)) {
 
 
 
-	
-		<?php
-		 include 'html/logo-brand.html'; 
-		 include 'html/footer.php'; 
-		 include 'html/copyright.html'; 
+
+	<?php
+	include 'html/logo-brand.html';
+	include 'html/footer.php';
+	include 'html/copyright.html';
 
 
-		 include 'injectables.html';
-		 ?>
+	include 'injectables.html';
+	?>
 
 	<script>
 		window.onload = function() {

@@ -33,12 +33,12 @@
 												<form id="logoutForm" method="POST" action="function/logout.php">
 												</form>
 											</i>
-											<a class="mobile-hide shopping-cart" href="cart"><i id="cart" class="fas fa-shopping-cart"></i></a>
+											<a class="mobile-hide shopping-cart" href="503-cart"><i id="cart" class="fas fa-shopping-cart"></i></a>
 										</a>
 									<?php
 									} else { ?>
 										<a class="mobile-hide login-icon" data-toggle="modal" data-target="#loginModal"><i class="fas fa-user"></i></a>
-										<!-- <a class="shopping-cart" href="cart"><i id="cart" class="fas fa-shopping-cart"></i></a> -->
+										
 									<?php
 									}
 									?>
@@ -51,7 +51,7 @@
 					</nav>
 					<?php if ($isLoggedIn === 1) {
 					?>
-						<a class="mobile-show shopping-cart" href="cart"><i id="cart" class="fas fa-shopping-cart"></i></a>
+						<a class="mobile-show shopping-cart" href="503-cart"><i id="cart" class="fas fa-shopping-cart"></i></a>
 					<?php
 					} else { ?>
 						<a class="mobile-show login-icon" data-toggle="modal" data-target="#loginModal"><i class="fas fa-user"></i></a>
@@ -75,9 +75,9 @@
 if ($isLoggedIn === 1) {
 	// Code to execute if user is logged in
 } else {
-	include("../index-resources/modal/signup-modal.html");
-	include("../index-resources/modal/user-login-modal.html");
-	include("../index-resources/modal/admin-login-modal.html");
+	include("html/modal/signup-modal.html");
+	include("html/modal/user-login-modal.html");
+	include("html/modal/admin-login-modal.html");
 }
 ?>
 
