@@ -45,7 +45,7 @@ while ($row = mysqli_fetch_assoc($result_products)) {
 
 
 
-
+<!DOCTYPE html>
 <html lang="en">
 
 <?php include("head.html"); ?>
@@ -146,7 +146,7 @@ while ($row = mysqli_fetch_assoc($result_products)) {
 								<span class="discount" style="margin-left: 25px"><?= $product['Discount'] ?>% Off</span>
 							<?php endif; ?>
 							<div class="product-image">
-								<a href="single-product.html"><img src="<?= $product['ImageURL'] ?>" alt=""></a>
+								<a href="single-product.php"><img src="<?= $product['ImageURL'] ?>" alt=""></a>
 							</div>
 							<h3><?= $product['prod_name'] ?></h3>
 							<p class="product-price">
@@ -178,28 +178,19 @@ while ($row = mysqli_fetch_assoc($result_products)) {
 			</div>
 		</div>
 	</div>
-
-
-
-
 	<!-- end products -->
 
 
 
-	<!-- logo carousel -->
+	
+		<?php
+		 include 'html/logo-brand.html'; 
+		 include 'html/footer.php'; 
+		 include 'html/copyright.html'; 
 
-	<!-- end logo carousel -->
 
-	<!-- footer -->
-
-	<!-- end footer -->
-
-	<!-- copyright -->
-
-	<!-- end copyright -->
-
-	<?php include 'injectables.html'; ?>
-
+		 include 'injectables.html';
+		 ?>
 
 	<script>
 		window.onload = function() {

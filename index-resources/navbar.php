@@ -29,7 +29,10 @@
 										<?php if ($isLoggedIn === 1) {
 										?>
 											<a class="login-icon">
-												<i class="fas fa-sign-out-alt"></i>
+												<i class="fas fa-sign-out-alt" onclick="logoutConfirmation()">
+													<form id="logoutForm" method="POST" action="user/function/logout.php">
+													</form>
+												</i>
 												<a class="mobile-hide shopping-cart" href="user/cart"><i id="cart" class="fas fa-shopping-cart"></i></a>
 											</a>
 										<?php
@@ -39,7 +42,7 @@
 										<?php
 										}
 										?>
-										
+
 										<a class="mobile-hide search-bar-icon" href="#"><i class="fas fa-search"></i></a>
 
 									</div>
@@ -64,3 +67,14 @@
 		</div>
 	</div>
 	<!-- end header -->
+
+
+	<script>
+		function logoutConfirmation() {
+			var confirmLogout = confirm("Are you sure? You are about to logout.");
+
+			if (confirmLogout) {
+				document.getElementById("logoutForm").submit();
+			}
+		}
+	</script>

@@ -13,7 +13,7 @@ if (!check_login_user_universal($link)) {
   
 
 ?>
-
+<!DOCTYPE html>
 <html lang="en">
 <?php include 'head.html'; ?>
 

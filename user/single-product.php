@@ -1,8 +1,3 @@
-https://www.free-css.com/free-css-templates/page272/fruitkha
-
-
-
-
 <?php
 session_start();
 require_once '../database/connection.php';
@@ -19,6 +14,7 @@ if (!check_login_user_universal($link)) {
 
 
 ?>
+<!DOCTYPE html>
 <html lang="en">
 <?php require 'head.html'; ?>
 
