@@ -8,6 +8,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $itemName = mysqli_real_escape_string($link, $_POST['itemName']);
     $description = mysqli_real_escape_string($link, $_POST['description']);
     $price = mysqli_real_escape_string($link, $_POST['price']);
+    $stock = mysqli_real_escape_string($link, $_POST['stock']);
     $sizes = mysqli_real_escape_string($link, implode(',', $_POST['sizes']));
     $categoryID = mysqli_real_escape_string($link, $_POST['category']);
     $onSale = isset($_POST['sale-checkbox']) ? 1 : 0;
@@ -37,7 +38,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $query_product_data = "INSERT INTO product_data (product_id, CategoryID, onDiscount, Discount)
                                VALUES ('$productID', '$categoryID', '$onSale', '$discount')";
         if (mysqli_query($link, $query_product_data)) {
-            echo "New product has been added successfully!";
+            // Insert into product_inventory table
+            $query_inventory = "INSERT INTO product_inventory (product_id, stock, out_of_stock_datetime, replenished_datetime)
+                                VALUES ('$productID', '$stock', NULL, NULL)";
+            if (mysqli_query($link, $query_inventory)) {
+                echo "New product has been added successfully!";
+            } else {
+                echo "Error: " . $query_inventory . "<br>" . mysqli_error($link);
+            }
         } else {
             echo "Error: " . $query_product_data . "<br>" . mysqli_error($link);
         }
@@ -50,4 +58,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 } else {
     echo "Invalid request.";
 }
-?>

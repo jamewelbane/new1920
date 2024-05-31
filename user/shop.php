@@ -30,7 +30,7 @@ while ($row = mysqli_fetch_assoc($result_products)) {
 	// Format price with comma
 	$row['FormattedPrice'] = '₱' . number_format($row['Price'], 2); // 2 decimal places
 
-	
+
 
 
 
@@ -151,7 +151,7 @@ function generateToken($product_id, $secret_key)
 					<?php
 					$discount = $product['Discount'];
 					$formatted_discount = rtrim(rtrim(number_format($discount, 2), '0'), '.');
-					
+
 					if (strpos($formatted_discount, '.') === false) {
 						$formatted_discount = rtrim($formatted_discount, '.');
 					}
@@ -180,7 +180,7 @@ function generateToken($product_id, $secret_key)
 									<?= htmlspecialchars($product['FormattedPrice']) ?>
 								<?php endif; ?>
 							</p>
-							<a href="cart.html" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
+							<a class="cart-btn" data-product-id="<?= $product_id ?>"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
 						</div>
 					</div>
 				<?php endforeach; ?>
@@ -222,6 +222,69 @@ function generateToken($product_id, $secret_key)
 			}
 		};
 	</script>
+
+
+	<script>
+		document.querySelectorAll('.cart-btn').forEach(function(button) {
+			button.addEventListener('click', function() {
+				var isLoggedIn = <?php echo isset($_SESSION['userid']) ? 'true' : 'false'; ?>;
+
+				if (!isLoggedIn) {
+					// Add animation for not logged in
+					this.classList.add('animated', 'shake');
+
+					if (confirm("You need to log in first")) {
+						// Toggle the login modal
+						$('#loginModal').modal('toggle');
+					}
+				} else {
+					// Add animation for logged in
+					this.classList.add('animated', 'bounce');
+					alert("Added successfully");
+				}
+
+				// Remove animation classes after animation ends
+				this.addEventListener('animationend', function() {
+					this.classList.remove('animated', 'shake', 'bounce');
+				});
+			});
+		});
+	</script>
+
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			
+			var addToCartButtons = document.querySelectorAll(".cart-btn");
+
+
+			// Attach click event listener to each button
+			addToCartButtons.forEach(function(button) {
+				button.addEventListener("click", function() {
+					// Get the product ID associated with the button
+					var productId = button.getAttribute("data-product-id");
+
+					// Tjhe defa quantity for products in 'shop' is only 1
+					var quantity = 1; 
+
+					// Log the quantity before sending the AJAX request
+					console.log("Quantity:", quantity);
+
+					// Send an AJAX request to add the product to the cart
+					var xhr = new XMLHttpRequest();
+					xhr.open("POST", "../function/add-cart.php", true);
+					xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+					xhr.onreadystatechange = function() {
+						if (xhr.readyState === 4 && xhr.status === 200) {
+							// console.log(xhr.responseText);
+							fetchCartItems();
+						}
+					};
+					xhr.send("product_id=" + productId + "&quantity=" + quantity); // Include quantity in the request
+				});
+			});
+		});
+	</script>
+
 
 </body>
 

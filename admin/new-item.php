@@ -60,17 +60,17 @@ $sizes = mysqli_fetch_all($result_size, MYSQLI_ASSOC);
                                     <form id="newItemForm" enctype="multipart/form-data">
                                         <div class="form-group">
                                             <label for="itemName">Item Name</label>
-                                            <input type="text" class="form-control" id="itemName" name="itemName" placeholder="Name" style="color: white;">
+                                            <input type="text" class="form-control" id="itemName" name="itemName" placeholder="Name" style="color: white;" required>
                                         </div>
 
                                         <div class="form-group">
                                             <label for="description">Description</label>
-                                            <textarea class="form-control" id="description" name="description" rows="4" style="color: white;"></textarea>
+                                            <textarea class="form-control" id="description" name="description" rows="4" style="color: white;" required></textarea>
                                         </div>
 
                                         <div class="form-group">
                                             <label>Available Size</label>
-                                            <select class="js-example-basic-multiple" multiple="multiple" name="sizes[]" style="width:100%">
+                                            <select class="js-example-basic-multiple" multiple="multiple" name="sizes[]" style="width:100%" required>
                                                 <?php foreach ($sizes as $sizes) : ?>
                                                     <option value="<?= $sizes['sizes_all'] ?>"><?= $sizes['sizes_all'] ?></option>
                                                 <?php endforeach; ?>
@@ -78,29 +78,13 @@ $sizes = mysqli_fetch_all($result_size, MYSQLI_ASSOC);
                                         </div>
 
                                         <div class="form-group">
+                                            <label for="stock">Initial Stock</label>
+                                            <input type="number" value="1" min="1" class="form-control" id="stock" name="stock" placeholder="Stock" style="color: white;" required>
+                                        </div>
+
+                                        <div class="form-group">
                                             <label for="price">Price</label>
-                                            <input type="number" min="0" class="form-control" id="price" name="price" placeholder="Price" style="color: white;">
-                                        </div>
-
-
-                                        <div class="form-group">
-                                            <label for="category">Category</label>
-                                            <select class="form-control" id="category" name="category" style="color: white;">
-                                                <?php foreach ($categories as $category) : ?>
-                                                    <option value="<?= $category['CategoryID'] ?>"><?= $category['CategoryName'] ?></option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label>File upload</label>
-                                            <input type="file" name="img[]" class="file-upload-default">
-                                            <div class="input-group col-xs-12">
-                                                <input type="text" class="form-control file-upload-info" disabled placeholder="Upload Image" name="img">
-                                                <span class="input-group-append">
-                                                    <button class="file-upload-browse btn btn-primary" type="button">Upload</button>
-                                                </span>
-                                            </div>
+                                            <input type="number" min="1" class="form-control" id="price" name="price" placeholder="Price" style="color: white;" required>
                                         </div>
 
                                         <div class="form-check mx-sm-2">
@@ -112,9 +96,30 @@ $sizes = mysqli_fetch_all($result_size, MYSQLI_ASSOC);
                                             <label for="discount-percentage">Discount Percentage:</label>
                                             <input type="number" id="discount-percentage" class="form-control" name="discount-percentage" min="0" max="100" step="1">
                                         </div>
+
+                                        <div class="form-group">
+                                            <label for="category">Category</label>
+                                            <select class="form-control" id="category" name="category" style="color: white;" required>
+                                                <?php foreach ($categories as $category) : ?>
+                                                    <option value="<?= $category['CategoryID'] ?>"><?= $category['CategoryName'] ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>File upload</label>
+                                            <input type="file" name="img[]" class="file-upload-default" required>
+                                            <div class="input-group col-xs-12">
+                                                <input type="text" class="form-control file-upload-info" disabled placeholder="Upload Image" name="img">
+                                                <span class="input-group-append">
+                                                    <button class="file-upload-browse btn btn-primary" type="button">Upload</button>
+                                                </span>
+                                            </div>
+                                        </div>
+
                                         <div id="formMessage"></div>
                                         <button type="submit" id="submitBtn" class="btn btn-primary mr-2">Submit</button>
-                                        <button class="btn btn-dark" onclick="windows.location.relaod();">Reset</button>
+                                        <button class="btn btn-dark" onclick="window.location.reload();">Reset</button>
                                     </form>
                                 </div>
                             </div>
@@ -150,12 +155,29 @@ $sizes = mysqli_fetch_all($result_size, MYSQLI_ASSOC);
 
     <script>
         $(document).ready(function() {
-            $('#submitBtn').click(function() {
+            // Handle sale checkbox change
+            $('#sale-checkbox').change(function() {
+                if ($(this).is(':checked')) {
+                    $('#discount-percentage').attr('required', true);
+                } else {
+                    $('#discount-percentage').removeAttr('required');
+                }
+            });
+
+            $('#newItemForm').on('submit', function(e) {
+                e.preventDefault();
+
+                // Validate the form
+                if (!this.checkValidity()) {
+                    alert('Please fill out all required fields.');
+                    return;
+                }
+
                 // Disable the submit button to prevent multiple submissions
-                $(this).prop('disabled', true);
+                $('#submitBtn').prop('disabled', true);
 
                 // Serialize the form data
-                var formData = new FormData($('#newItemForm')[0]);
+                var formData = new FormData(this);
 
                 // Send AJAX request
                 $.ajax({

@@ -28,8 +28,8 @@
 								<div class="header-icons">
 									<?php if ($isLoggedIn === 1) {
 									?>
-										<a class="login-icon">
-											<i class="fas fa-sign-out-alt" onclick="logoutConfirmation()">
+										<a class="login-icon" onclick="logoutConfirmation()">
+											<i class="fas fa-sign-out-alt" >
 												<form id="logoutForm" method="POST" action="function/logout.php">
 												</form>
 											</i>
