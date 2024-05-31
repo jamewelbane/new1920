@@ -14,7 +14,7 @@ $currentTimestamp = date("Y-m-d H:i:s");
 // Check if product ID and quantity are set
 if (isset($_POST['product_id'], $_POST['quantity'])) {
     $product_id = intval($_POST['product_id']);
-    $quantity = intval($_POST['quantity']);
+    $quantity = $_POST['quantity'];
     $size = $_POST['size'];
 
     // Validate inputs

@@ -319,9 +319,9 @@ if (isset($_GET['product_id']) && isset($_GET['token'])) {
 						<?php endif; ?>
 						<p><?= $productDescription ?></p>
 						<div class="single-product-form">
-							<form action="index.html">
-								<input type="number" class="quantity-input" min="1" max="10" value="1">
-							</form>
+
+							<input type="number" class="quantity-input" min="1" max="10" value="1">
+
 							<a class="cart-btn" data-product-id="<?= $product_id ?>"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
 							<p><strong>Categories: </strong><?= $category_name_single ?></p>
 						</div>
@@ -482,7 +482,9 @@ if (isset($_GET['product_id']) && isset($_GET['token'])) {
 					var productId = button.getAttribute("data-product-id");
 
 					// The default quantity for products in 'shop' is only 1
-					var quantity = 1;
+					var quantityInput = this.parentNode.querySelector(".quantity-input");
+					var quantity = quantityInput.value || 1; // Default to 1 if not specified
+
 
 					var selectedSizeBox = button.closest('.single-product-content').querySelector('.size-box.selected');
 					var size = selectedSizeBox ? selectedSizeBox.getAttribute('data-size') : '';
@@ -548,7 +550,10 @@ if (isset($_GET['product_id']) && isset($_GET['token'])) {
 					var productId = button.getAttribute("data-product-id");
 
 					// The default quantity for products in 'shop' is only 1
-					var quantity = 1;
+
+					var quantityInput = button.parentNode.querySelector(".quantity-input");
+					var quantity = quantityInput.value || 1; // Set default quantity to 1 if not specified
+
 
 					var sizeDropdown = button.parentElement.querySelector(".size-dropdown");
 					var selectedSize = sizeDropdown.value;
