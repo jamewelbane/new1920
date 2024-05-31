@@ -10,7 +10,7 @@ if (!check_login_user_universal($link)) {
 	$verifiedUID = $_SESSION['userid'];
 	$isLoggedIn = 1;
 }
-  
+
 
 ?>
 <!DOCTYPE html>
@@ -19,8 +19,8 @@ if (!check_login_user_universal($link)) {
 
 <body>
 
-	<?php 
-	
+	<?php
+
 	// include 'html/pre-loader.html';
 	include("navbar.php");
 
@@ -73,37 +73,16 @@ if (!check_login_user_universal($link)) {
 									<th class="product-image">Product Image</th>
 									<th class="product-name">Name</th>
 									<th class="product-price">Price</th>
+									<th class="product-size">Size</th>
 									<th class="product-quantity">Quantity</th>
-									<th class="product-total">Total</th>
+									<th class="product-row-total">Total</th>
 								</tr>
 							</thead>
-							<tbody>
-								<tr class="table-body-row">
-									<td class="product-remove"><a href="#"><i class="far fa-window-close"></i></a></td>
-									<td class="product-image"><img src="assets/img/products/product-img-1.jpg" alt=""></td>
-									<td class="product-name">Strawberry</td>
-									<td class="product-price">$85</td>
-									<td class="product-quantity"><input type="number" placeholder="0"></td>
-									<td class="product-total">1</td>
-								</tr>
-								<tr class="table-body-row">
-									<td class="product-remove"><a href="#"><i class="far fa-window-close"></i></a></td>
-									<td class="product-image"><img src="assets/img/products/product-img-2.jpg" alt=""></td>
-									<td class="product-name">Berry</td>
-									<td class="product-price">$70</td>
-									<td class="product-quantity"><input type="number" placeholder="0"></td>
-									<td class="product-total">1</td>
-								</tr>
-								<tr class="table-body-row">
-									<td class="product-remove"><a href="#"><i class="far fa-window-close"></i></a></td>
-									<td class="product-image"><img src="assets/img/products/product-img-3.jpg" alt=""></td>
-									<td class="product-name">Lemon</td>
-									<td class="product-price">$35</td>
-									<td class="product-quantity"><input type="number" placeholder="0"></td>
-									<td class="product-total">1</td>
-								</tr>
+							<tbody id="cart-items-tbody">
+								<!-- Cart items will be dynamically populated here -->
 							</tbody>
 						</table>
+
 					</div>
 				</div>
 
@@ -119,15 +98,15 @@ if (!check_login_user_universal($link)) {
 							<tbody>
 								<tr class="total-data">
 									<td><strong>Subtotal: </strong></td>
-									<td>$500</td>
+									<td id="subtotal">₱0.00</td>
 								</tr>
 								<tr class="total-data">
 									<td><strong>Shipping: </strong></td>
-									<td>$45</td>
+									<td>₱60.00</td>
 								</tr>
 								<tr class="total-data">
 									<td><strong>Total: </strong></td>
-									<td>$545</td>
+									<td id="total">₱60.00</td>
 								</tr>
 							</tbody>
 						</table>
@@ -152,106 +131,18 @@ if (!check_login_user_universal($link)) {
 	</div>
 	<!-- end cart -->
 
-	<!-- logo carousel -->
-	<div class="logo-carousel-section">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-12">
-					<div class="logo-carousel-inner">
-						<div class="single-logo-item">
-							<img src="assets/img/company-logos/1.png" alt="">
-						</div>
-						<div class="single-logo-item">
-							<img src="assets/img/company-logos/2.png" alt="">
-						</div>
-						<div class="single-logo-item">
-							<img src="assets/img/company-logos/3.png" alt="">
-						</div>
-						<div class="single-logo-item">
-							<img src="assets/img/company-logos/4.png" alt="">
-						</div>
-						<div class="single-logo-item">
-							<img src="assets/img/company-logos/5.png" alt="">
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- end logo carousel -->
-
-	<!-- footer -->
-	<div class="footer-area">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-3 col-md-6">
-					<div class="footer-box about-widget">
-						<h2 class="widget-title">About us</h2>
-						<p>Ut enim ad minim veniam perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae.</p>
-					</div>
-				</div>
-				<div class="col-lg-3 col-md-6">
-					<div class="footer-box get-in-touch">
-						<h2 class="widget-title">Get in Touch</h2>
-						<ul>
-							<li>34/8, East Hukupara, Gifirtok, Sadan.</li>
-							<li>support@fruitkha.com</li>
-							<li>+00 111 222 3333</li>
-						</ul>
-					</div>
-				</div>
-				<div class="col-lg-3 col-md-6">
-					<div class="footer-box pages">
-						<h2 class="widget-title">Pages</h2>
-						<ul>
-							<li><a href="index.html">Home</a></li>
-							<li><a href="about.html">About</a></li>
-							<li><a href="services.html">Shop</a></li>
-							<li><a href="news.html">News</a></li>
-							<li><a href="contact.html">Contact</a></li>
-						</ul>
-					</div>
-				</div>
-				<div class="col-lg-3 col-md-6">
-					<div class="footer-box subscribe">
-						<h2 class="widget-title">Subscribe</h2>
-						<p>Subscribe to our mailing list to get the latest updates.</p>
-						<form action="index.html">
-							<input type="email" placeholder="Email">
-							<button type="submit"><i class="fas fa-paper-plane"></i></button>
-						</form>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- end footer -->
-
-	<!-- copyright -->
-	<div class="copyright">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-6 col-md-12">
-					<p>Copyrights &copy; 2019 - <a href="https://imransdesign.com/">Imran Hossain</a>, All Rights Reserved.</p>
-				</div>
-				<div class="col-lg-6 text-right col-md-12">
-					<div class="social-icons">
-						<ul>
-							<li><a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a></li>
-							<li><a href="#" target="_blank"><i class="fab fa-twitter"></i></a></li>
-							<li><a href="#" target="_blank"><i class="fab fa-instagram"></i></a></li>
-							<li><a href="#" target="_blank"><i class="fab fa-linkedin"></i></a></li>
-							<li><a href="#" target="_blank"><i class="fab fa-dribbble"></i></a></li>
-						</ul>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- end copyright -->
 
 
-	<?php require 'injectables.html'; ?>
+
+
+	<?php
+	include 'html/logo-brand.html';
+	include 'html/footer.php';
+	include 'html/copyright.html';
+
+
+	include 'injectables.html';
+	?>
 
 	<script>
 		window.onload = function() {
@@ -261,6 +152,82 @@ if (!check_login_user_universal($link)) {
 			}
 		};
 	</script>
+
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			fetchCartItems();
+
+			function fetchCartItems() {
+				var xhr = new XMLHttpRequest();
+				xhr.open("GET", "function/fetch-cart.php", true); // Update the path to your fetch-cart.php script
+				xhr.onreadystatechange = function() {
+					if (xhr.readyState === 4 && xhr.status === 200) {
+						var response = JSON.parse(xhr.responseText);
+						if (response.status === 'success') {
+							var cartItems = response.data;
+							var tbody = document.getElementById('cart-items-tbody');
+							tbody.innerHTML = ''; // Clear existing content
+
+							var subtotal = 0.00;
+
+							cartItems.forEach(function(item) {
+								var priceContent = item.discounted_price != item.original_price ?
+									`<span style="text-decoration: line-through;">₱${item.original_price}</span> ₱${item.discounted_price}` :
+									`₱${item.original_price}`;
+
+								var tr = document.createElement('tr');
+								tr.classList.add('table-body-row');
+								tr.innerHTML = `
+                            <td class="product-remove"><a href="#"><i class="far fa-window-close"></i></a></td>
+                            <td class="product-image"><img src="${item.ImageURL}" alt=""></td>
+                            <td class="product-name">${item.prod_name}</td>
+                            <td class="product-price">${priceContent}</td>
+                            <td class="product-size">${item.prod_size}</td>
+                            <td class="product-quantity"><input type="number" value="${item.quantity}" min="1" max="10" onchange="updateQuantity(${item.product_id}, this.value)"></td>
+                            <td class="product-row-total">₱${item.row_total}</td>
+                        `;
+
+								tbody.appendChild(tr);
+
+								subtotal += parseFloat(item.row_total.replace(/[^0-9.-]+/g, ""));
+							});
+
+							// Update the subtotal and total with comma separators
+							var shippingFee = 60.00;
+							var total = subtotal + shippingFee;
+							document.getElementById('subtotal').innerText = `₱${subtotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+							document.getElementById('total').innerText = `₱${total.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+						} else {
+							alert(response.message);
+						}
+					}
+				};
+				xhr.send();
+			}
+
+			function updateQuantity(productId, newQuantity) {
+				// Function to update quantity in the database via AJAX
+				var xhr = new XMLHttpRequest();
+				xhr.open("POST", "function/update-cart.php", true);
+				xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+				xhr.onreadystatechange = function() {
+					if (xhr.readyState === 4 && xhr.status === 200) {
+						var response = JSON.parse(xhr.responseText);
+						if (response.status === 'success') {
+							fetchCartItems(); // Refresh cart items after update
+						} else {
+							alert(response.message);
+						}
+					}
+				};
+				xhr.send(`product_id=${productId}&quantity=${newQuantity}`);
+			}
+		});
+	</script>
+
+
+
+
 
 </body>
 

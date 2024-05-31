@@ -17,7 +17,7 @@ $result_categories = mysqli_query($link, $query_categories);
 $categories = mysqli_fetch_all($result_categories, MYSQLI_ASSOC);
 
 
-$query_products = "SELECT p.product_id, p.prod_name, p.Description, p.Price, p.ImageURL, c.CategoryName, pd.CategoryID, pd.isNew, pd.onDiscount, pd.Discount
+$query_products = "SELECT p.product_id, p.prod_name, p.Description, p.Price, p.ImageURL, p.sizes, c.CategoryName, pd.CategoryID, pd.isNew, pd.onDiscount, pd.Discount
                    FROM products p
                    INNER JOIN product_data pd ON p.product_id = pd.product_id
                    INNER JOIN category c ON pd.CategoryID = c.CategoryID";
@@ -62,6 +62,32 @@ function generateToken($product_id, $secret_key)
 <?php include("head.html"); ?>
 
 <style>
+	.size-dropdown {
+					margin-bottom: 10px;
+
+				}
+				
+	.size-box {
+		display: inline-block;
+		width: 40px;
+		height: 40px;
+		margin: 5px;
+		border: 2px solid #ddd;
+		cursor: pointer;
+		text-align: center;
+		line-height: 40px;
+		font-weight: bold;
+	}
+
+
+	.size-box.selected {
+		border-color: #F28123;
+	}
+
+	.sizes {
+		margin-top: 10px;
+	}
+
 	.discount,
 	.new {
 		position: absolute;
@@ -146,6 +172,8 @@ function generateToken($product_id, $secret_key)
 				</div>
 			</div>
 
+			<
+
 			<div class="row product-lists">
 				<?php foreach ($products as $product) : ?>
 					<?php
@@ -180,11 +208,34 @@ function generateToken($product_id, $secret_key)
 									<?= htmlspecialchars($product['FormattedPrice']) ?>
 								<?php endif; ?>
 							</p>
+							<div>
+								<select class="size-dropdown">
+									<option value="" selected>Select Size</option>
+									<?php
+									// Check if SizesArray exists and is an array
+									if (isset($product['sizes']) && is_string($product['sizes'])) {
+										// Split the string into an array of sizes
+										$sizesArray = explode(',', $product['sizes']);
+
+										// Loop through each size and create an option in the select dropdown
+										foreach ($sizesArray as $size) {
+											echo "<option value='$size'>$size</option>";
+										}
+									} else {
+										// Handle case where Sizes column is not set or not a string
+										echo "<option value='' disabled>No sizes available</option>";
+									}
+									?>
+								</select>
+							</div>
+
 							<a class="cart-btn" data-product-id="<?= $product_id ?>"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
+
 						</div>
 					</div>
 				<?php endforeach; ?>
 			</div>
+
 
 
 
@@ -223,7 +274,6 @@ function generateToken($product_id, $secret_key)
 		};
 	</script>
 
-
 	<script>
 		document.querySelectorAll('.cart-btn').forEach(function(button) {
 			button.addEventListener('click', function() {
@@ -237,10 +287,6 @@ function generateToken($product_id, $secret_key)
 						// Toggle the login modal
 						$('#loginModal').modal('toggle');
 					}
-				} else {
-					// Add animation for logged in
-					this.classList.add('animated', 'bounce');
-					alert("Added successfully");
 				}
 
 				// Remove animation classes after animation ends
@@ -249,13 +295,9 @@ function generateToken($product_id, $secret_key)
 				});
 			});
 		});
-	</script>
 
-	<script>
 		document.addEventListener("DOMContentLoaded", function() {
-			
 			var addToCartButtons = document.querySelectorAll(".cart-btn");
-
 
 			// Attach click event listener to each button
 			addToCartButtons.forEach(function(button) {
@@ -263,27 +305,40 @@ function generateToken($product_id, $secret_key)
 					// Get the product ID associated with the button
 					var productId = button.getAttribute("data-product-id");
 
-					// Tjhe defa quantity for products in 'shop' is only 1
-					var quantity = 1; 
+					// The default quantity for products in 'shop' is only 1
+					var quantity = 1;
+
+					var sizeDropdown = button.parentElement.querySelector(".size-dropdown");
+					var selectedSize = sizeDropdown.value;
 
 					// Log the quantity before sending the AJAX request
 					console.log("Quantity:", quantity);
 
 					// Send an AJAX request to add the product to the cart
 					var xhr = new XMLHttpRequest();
-					xhr.open("POST", "../function/add-cart.php", true);
+					xhr.open("POST", "function/add-cart.php", true);
 					xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 					xhr.onreadystatechange = function() {
 						if (xhr.readyState === 4 && xhr.status === 200) {
-							// console.log(xhr.responseText);
+							var response = JSON.parse(xhr.responseText);
+							// Display the message from add-cart.php as an alert
+							alert(response.message);
+							if (response.status === 'success') {
+								button.classList.add('animated', 'bounce');
+							} else {
+								button.classList.add('animated', 'shake');
+							}
+							// Update the cart items after adding to cart
 							fetchCartItems();
 						}
 					};
-					xhr.send("product_id=" + productId + "&quantity=" + quantity); // Include quantity in the request
+					xhr.send("product_id=" + productId + "&quantity=" + quantity + "&size=" + selectedSize); // Include quantity in the request
 				});
 			});
 		});
 	</script>
+
+
 
 
 </body>
