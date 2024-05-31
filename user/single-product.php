@@ -193,7 +193,7 @@ if (isset($_GET['product_id']) && isset($_GET['token'])) {
 
 
 	.size-box.selected {
-		border-color: #000;
+		border-color: #F28123;
 	}
 
 	.sizes {
@@ -319,7 +319,7 @@ if (isset($_GET['product_id']) && isset($_GET['token'])) {
 						<p><?= $productDescription ?></p>
 						<div class="single-product-form">
 							<form action="index.html">
-								<input type="number" placeholder="0">
+								<input type="number" min="1" max="10" value="1">
 							</form>
 							<a href="cart.html" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
 							<p><strong>Categories: </strong><?= $category_name_single ?></p>

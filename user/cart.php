@@ -142,7 +142,7 @@ if (!check_login_user_universal($link)) {
 						<div class="coupon-form-wrap">
 							<form action="index.html">
 								<p><input type="text" placeholder="Coupon"></p>
-								<p><input type="submit" value="Apply"></p>
+								<p><input type="submit" style="color: white;" value="Apply"></p>
 							</form>
 						</div>
 					</div>
