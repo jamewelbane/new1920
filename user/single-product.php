@@ -550,10 +550,7 @@ if (isset($_GET['product_id']) && isset($_GET['token'])) {
 					var productId = button.getAttribute("data-product-id");
 
 					// The default quantity for products in 'shop' is only 1
-
-					var quantityInput = button.parentNode.querySelector(".quantity-input");
-					var quantity = quantityInput.value || 1; // Set default quantity to 1 if not specified
-
+					var quantity = 1;
 
 					var sizeDropdown = button.parentElement.querySelector(".size-dropdown");
 					var selectedSize = sizeDropdown.value;
