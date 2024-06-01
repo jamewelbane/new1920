@@ -105,7 +105,7 @@ if (isset($_GET['product_id']) && isset($_GET['token'])) {
 					$category_id = $row['CategoryID'];
 
 					// Fetch products that match the fetched CategoryID and exclude the current product_id
-					$query_products = "SELECT p.product_id, p.prod_name, p.Description, p.Price, p.ImageURL, c.CategoryName, pd.CategoryID, pd.isNew, pd.onDiscount, pd.Discount
+					$query_products = "SELECT p.product_id, p.prod_name, p.Description, p.Price, p.ImageURL, p.sizes, c.CategoryName, pd.CategoryID, pd.isNew, pd.onDiscount, pd.Discount
                            FROM products p
                            INNER JOIN product_data pd ON p.product_id = pd.product_id
                            INNER JOIN category c ON pd.CategoryID = c.CategoryID
@@ -389,9 +389,9 @@ if (isset($_GET['product_id']) && isset($_GET['token'])) {
 									<option value="" selected>Select Size</option>
 									<?php
 									// Check if SizesArray exists and is an array
-									if (isset($productData['Sizes']) && is_string($productData['Sizes'])) {
+									if (isset($product['sizes']) && is_string($product['sizes'])) {
 										// Split the string into an array of sizes
-										$sizesArray = explode(',', $productData['Sizes']);
+										$sizesArray = explode(',', $product['sizes']);
 
 										// Loop through each size and create an option in the select dropdown
 										foreach ($sizesArray as $size) {

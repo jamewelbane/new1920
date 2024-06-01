@@ -31,7 +31,7 @@
       <div class="collapse" id="ui-shop">
         <ul class="nav flex-column sub-menu">
           <li class="nav-item"> <a class="nav-link" href="new-item">Add Item</a></li>
-          <li class="nav-item"> <a class="nav-link" href="error-404.html">Inventory</a></li>
+          <li class="nav-item"> <a class="nav-link" href="inventory">Inventory</a></li>
         </ul>
       </div>
     </li>
