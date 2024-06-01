@@ -5,7 +5,7 @@ require("user/function/check-login.php");
 
 $isLoggedIn = 0;
 if (!check_login_user_universal($link)) {
-  
+
   $isLoggedIn = 0;
 } else {
   $verifiedUID = $_SESSION['userid'];
@@ -16,12 +16,12 @@ if (!check_login_user_universal($link)) {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
- 
-
-
   $username = $_POST["signupusername"];
   $email = $_POST["email"];
   $password = $_POST["userpass"];
+
+  $phone_num = $_POST["phone_num"];
+  $user_address = $_POST["user_address"];
 
 
   $hashed_password = password_hash($password, PASSWORD_BCRYPT);
@@ -35,21 +35,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if ($stmt->affected_rows > 0) {
     // Registration success
     $new_user_id = $stmt->insert_id; // Get the ID of the newly inserted user
-    $_SESSION['userid'] = $new_user_id; // Store the user ID in the session
-    echo "<script>alert('Registration successful!');</script>";
-    echo "<script>window.location.href = 'user/shop';</script>";
-    exit;
+
+    // Insert user information into user_info table
+    $stmt_user_info = $link->prepare("INSERT INTO user_info (user_id, address, email, phone_number) VALUES (?, ?, ?, ?)");
+    $stmt_user_info->bind_param("isss", $new_user_id, $user_address, $email, $phone_num);
+    $stmt_user_info->execute();
+
+    if ($stmt_user_info->affected_rows > 0) {
+      // User info insertion success
+      $_SESSION['userid'] = $new_user_id; // Store the user ID in the session
+      echo "<script>alert('Registration successful!');</script>";
+      echo "<script>window.location.href = 'user/shop';</script>";
+      exit;
+    } else {
+      // User info insertion failed
+      echo "<script>alert('User information insertion failed. Please try again later.');</script>";
+    }
+
+    $stmt_user_info->close();
   } else {
     // Registration failed
     echo "<script>alert('Registration failed. Please try again later.');</script>";
   }
 
-
   $stmt->close();
-
   $link->close();
 }
 ?>
+
 
 
 <!DOCTYPE html>
@@ -88,17 +101,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
                 <div class="form-group">
                   <label>Username</label>
-                  <input type="text" class="form-control p_input" name="signupusername">
+                  <input type="text" class="username form-control p_input" name="signupusername" style="color: white">
                 </div>
                 <div class="form-group">
                   <label>Email</label>
-                  <input type="email" class="form-control p_input" name="email">
+                  <input type="email" class="form-control p_input" name="email" style="color: white">
                 </div>
                 <div class="form-group">
                   <label>Password</label>
-                  <input type="password" class="form-control p_input" id="passwordField" name="userpass">
+                  <input type="password" class="form-control p_input" id="passwordField" name="userpass" style="color: white">
+                </div>
+
+                <div class="form-group">
+                  <label>Phone</label>
+                  <input type="text" class="form-control p_input" name="phone_num" style="color: white">
 
                 </div>
+
+                <div class="form-group">
+                  <label>Complete Address</label>
+
+                  <textarea class="form-control" name="user_address" rows="4" id="user_address" style="color: white"></textarea>
+                </div>
+
+
                 <div class="form-group d-flex align-items-center justify-content-between">
                   <div class="form-check">
                     <label class="form-check-label">
@@ -109,12 +135,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="text-center">
                   <button type="submit" class="btn btn-primary btn-block enter-btn">Register</button>
                 </div>
-                <div class="d-flex">
-                  <button class="btn btn-facebook col mr-2">
-                    <i class="mdi mdi-facebook"></i> Facebook </button>
-                  <button class="btn btn-google col">
-                    <i class="mdi mdi-google-plus"></i> Google plus </button>
-                </div>
+
                 <p class="sign-up text-center">Already have an Account?<a href="index"> Sign In</a></p>
                 <p class="terms">By creating an account you are accepting our<a href="#"> Terms & Conditions</a></p>
               </form>

@@ -145,7 +145,7 @@ mysqli_close($link);
 							</table>
 							<div class="cart-buttons">
 								<a onclick="window.location.reload()" class="boxed-btn">Update Cart</a>
-								<a href="checkout.html" class="boxed-btn black">Check Out</a>
+								<a class="boxed-btn black">Check Out</a>
 							</div>
 						</div>
 
