@@ -31,9 +31,9 @@ if (isset($_POST['product_id'], $_POST['quantity'])) {
 
 
     // Check if product exists and has sufficient stock
-    $query = "SELECT stock FROM product_inventory WHERE product_id = ?";
+    $query = "SELECT stock FROM product_inventory WHERE product_id = ? AND prod_size = ?";
     $stmt = $link->prepare($query);
-    $stmt->bind_param("i", $product_id);
+    $stmt->bind_param("is", $product_id, $size);
     $stmt->execute();
     $result = $stmt->get_result();
 
