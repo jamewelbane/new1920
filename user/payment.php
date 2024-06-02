@@ -149,7 +149,7 @@ $stmtCart->close();
 									$row_total = $price * $item['quantity'];
 								?>
 									<tr>
-										<td><?php echo htmlspecialchars($prod_name . ' | ' . $item['prod_size'] . ' | ' . $item['quantity'] . ' pair'); ?></td>
+										<td><?php echo htmlspecialchars($prod_name . '-' . $item['prod_size'] . ', ' . $item['quantity'] . ' pair'); ?></td>
 										<td>₱<?php echo number_format($row_total, 2); ?></td>
 									</tr>
 								<?php endforeach; ?>
@@ -178,19 +178,25 @@ $stmtCart->close();
 	<script>
 		document.getElementById('placeOrderButton').addEventListener('click', function() {
 			if (confirm('Proceed with placing your order?')) {
-				// Get the value of the note textarea
+		
 				var note = document.getElementById('note').value;
 
 				// Get the proof of payment image file
 				var proofOfPaymentFile = document.getElementById('proofOfPayment').files[0];
 
+				// Generate a unique identifier for the image name
+				var uniqueIdentifier = Date.now(); // Using timestamp as the unique identifier
+
+				// Construct the image name with the unique identifier
+				var imageName = 'proof_payment_' + uniqueIdentifier + '_' + proofOfPaymentFile.name;
+
 				// Prepare form data to send to checkout script
 				var formData = new FormData();
 				formData.append('action', 'checkout');
 				formData.append('note', note);
-				formData.append('proof_of_payment', proofOfPaymentFile);
+				formData.append('proof_of_payment', proofOfPaymentFile, imageName); // Append the image with the new name
 
-				// Proceed with checkout
+			
 				fetch('function/checkout.php', {
 						method: 'POST',
 						body: formData
