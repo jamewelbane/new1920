@@ -9,7 +9,7 @@
 
 
 <?php
-// Include database connection
+
 require_once("../../database/connection.php");
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -113,6 +113,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </style>
 
 
-<!-- <p>In stock: All size have a value of 3 or more </p>
-<p>Low stock: One or more size have a value of less than stock</p>
-<p>Out Of Stock: No available stock for all sizes</p> -->

@@ -20,6 +20,7 @@ if (!check_login_user_universal($link)) {
 
 
 </head>
+
 <body>
 
 
@@ -52,6 +53,8 @@ if (!check_login_user_universal($link)) {
                                                     <th>Id</th>
                                                     <th>Txn</th>
                                                     <th>User</th>
+                                                    <th>To pay</th>
+                                                    <th>Date Ordered</th>
                                                     <th>Status</th>
                                                     <th>Action</th>
                                                 </tr>
@@ -60,36 +63,46 @@ if (!check_login_user_universal($link)) {
                                                 <?php
 
 
-                                                // Fetch products
-                                                $query = "SELECT product_id, prod_name, createdAt FROM products";
+                                                // Fetch orders
+                                                $query = "SELECT * FROM orders";
                                                 $result = mysqli_query($link, $query);
 
                                                 while ($row = mysqli_fetch_assoc($result)) {
-                                                    $productId = $row['product_id'];
-                                                    $createdAt = date('d M Y', strtotime($row['createdAt']));
 
-                                                    // Determine stock status
-                                                    $statusQuery = "SELECT stock FROM product_inventory WHERE product_id = '$productId'";
-                                                    $statusResult = mysqli_query($link, $statusQuery);
-                                                    $stocks = [];
-                                                    while ($statusRow = mysqli_fetch_assoc($statusResult)) {
-                                                        $stocks[] = $statusRow['stock'];
-                                                    }
+                                                    $userid = $row['userid'];
 
-                                                    if (empty($stocks) || array_sum($stocks) == 0) {
-                                                        $status = '<label class="badge badge-danger">Out Of Stock</label>';
-                                                    } elseif (min($stocks) < 3) {
-                                                        $status = '<label class="badge badge-warning">Low Stock</label>';
-                                                    } else {
-                                                        $status = '<label class="badge badge-success">In Stock</label>';
-                                                    }
+                                                    // Fetch username
+                                                    $usernameQuery = "SELECT username FROM users WHERE userid = ?";
+                                                    $stmtUsername = $link->prepare($usernameQuery);
+                                                    $stmtUsername->bind_param("i", $userid);
+                                                    $stmtUsername->execute();
+                                                    $resultUsername = $stmtUsername->get_result();
+                                                    $username = $resultUsername->fetch_assoc()['username'];
+                                                    $stmtUsername->close();
+
+                                                    $status = $row['order_status'];
+
+                                                    $order_id = $row['order_id'];
+                                                    $transaction_number = $row['transaction_number'];
+
+                                                    $createdAt = date('d M Y', strtotime($row['created_at']));
+
+                                                    if ($status === 'Pending') {
+                                                        $status = '<label class="badge badge-warning">Pending</label>';
+                                                    } 
 
                                                     echo "<tr>
-                                                        <td>{$row['product_id']}</td>
-                                                        <td>{$row['prod_name']}</td>
+                                                        <td>{$row['order_id']}</td>
+                                                        <td>{$row['transaction_number']}</td>
+                                                        <td>{$username}</td>
+                                                        <td style='color: green;'>₱" . number_format($row['total_amount'], 2, '.', ',') . "</td>
                                                         <td>{$createdAt}</td>
                                                         <td>{$status}</td>
-                                                        <td><button type='button' data-product_id='{$row['product_id']}' class='view-inventory btn btn-outline-secondary btn-icon-text'><i class='fas fa-box-open'></i></button></td>
+                                                        <td>
+                                                            <button type='button' data-txn='{$row['transaction_number']}' class='view-order btn btn-primary btn-md'>List <i class='fas fa-clipboard-list'></i></button>
+                                                            <button type='button' data-userid='{$row['userid']}' class='view-user btn btn-info btn-md'>Info <i class='fas fa-user'></i></button>
+                                                            <button type='button' data-userid='{$row['userid']}' class='email-user btn btn-success btn-md'>Email <i class='fas fa-envelope'></i></button>
+                                                        </td>
                                                     </tr>";
                                                 }
 
@@ -122,20 +135,20 @@ if (!check_login_user_universal($link)) {
 <script>
     $(function() {
         // Use event delegation for the click event
-        $(document).on('click', '.view-inventory', function() {
-            var product_id = $(this).data('product_id');
+        $(document).on('click', '.view-order', function() {
+            var txn = $(this).data('txn');
             $.ajax({
-                url: 'function/manage-inventory.php',
+                url: 'function/order-list.php',
                 type: 'post',
                 data: {
-                    product_id: product_id
+                    txn: txn
                 },
                 success: function(response) {
-                    $('.inventorymodalbody').html(response);
-                    $('#inventoryModal').modal('show');
+                    $('.ordermodalbody').html(response);
+                    $('#orderModal').modal('show');
 
                     $(document).on('click', '#close-btn', function() {
-                        $('#inventoryModal').modal('hide');
+                        $('#orderModal').modal('hide');
                     });
                 }
             });
@@ -145,15 +158,15 @@ if (!check_login_user_universal($link)) {
 
 
 <!-- Modal for inventory -->
-<div class="modal fade" id="inventoryModal" tabindex="-1" role="dialog" aria-labelledby="editQuestionModalModalLabel" aria-hidden="true">
+<div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="editQuestionModalModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Inventory</h5>
                 <button type="button" class="close" id="close-btn" data-dismiss="modal">&times;</button>
             </div>
-            <div class="inventorymodalbody modal-body">
-                
+            <div class="ordermodalbody modal-body">
+
                 <!-- Content will be loaded here from edit-temp-question.php -->
             </div>
         </div>

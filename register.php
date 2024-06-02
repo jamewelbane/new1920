@@ -16,6 +16,7 @@ if (!check_login_user_universal($link)) {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
+  $fullname = $_POST["fullname"];
   $username = $_POST["signupusername"];
   $email = $_POST["email"];
   $password = $_POST["userpass"];
@@ -37,8 +38,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $new_user_id = $stmt->insert_id; // Get the ID of the newly inserted user
 
     // Insert user information into user_info table
-    $stmt_user_info = $link->prepare("INSERT INTO user_info (user_id, address, email, phone_number) VALUES (?, ?, ?, ?)");
-    $stmt_user_info->bind_param("isss", $new_user_id, $user_address, $email, $phone_num);
+    $stmt_user_info = $link->prepare("INSERT INTO user_info (user_id,name, address, email, phone_number) VALUES (?, ?, ?, ?, ?)");
+    $stmt_user_info->bind_param("issss", $new_user_id, $fullname, $user_address, $email, $phone_num);
     $stmt_user_info->execute();
 
     if ($stmt_user_info->affected_rows > 0) {
@@ -99,6 +100,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="card-body px-5 py-5">
               <h3 class="card-title text-left mb-3">Register</h3>
               <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+                <div class="form-group">
+                  <label>Fullname</label>
+                  <input type="text" class="fullname form-control p_input" name="fullname" style="color: white">
+                </div>
                 <div class="form-group">
                   <label>Username</label>
                   <input type="text" class="username form-control p_input" name="signupusername" style="color: white">

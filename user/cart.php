@@ -306,7 +306,7 @@ mysqli_close($link);
 	<!-- checkout button -->
 	<script>
 		document.getElementById('checkoutButton').addEventListener('click', function() {
-			if (confirm('Are you sure you want to proceed with the checkout?')) {
+			if (confirm('Proceed with checkout?')) {
 				// Proceed with checkout
 				fetch('function/checkout.php', {
 						method: 'POST',
@@ -315,11 +315,12 @@ mysqli_close($link);
 						},
 						body: 'action=checkout'
 					})
-					.then(response => response.text())
+					.then(response => response.json()) // Expect a JSON response
 					.then(data => {
-						alert(data);
-						
-						window.location.href = 'cart';
+						alert(data.message);
+						if (data.success) {
+							window.location.href = `payment.php?transaction_number=${data.transaction_number}&userid=${data.userid}&token=${data.token}`;
+						}
 					})
 					.catch(error => console.error('Error:', error));
 			}

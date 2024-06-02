@@ -4,10 +4,9 @@ require_once '../../database/connection.php';
 
 // Verify if user is logged in
 if (!isset($_SESSION['userid'])) {
-    echo "You need to log in first.";
+    echo json_encode(["success" => false, "message" => "You need to log in first."]);
     exit;
 }
-
 
 $verifiedUID = $_SESSION['userid'];
 
@@ -42,16 +41,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['action'] == 'checkout') {
     // Generate a unique transaction number
     $transaction_number = uniqid('txn_');
 
-    // Insert into order_totals table
-    $stmt = $link->prepare("INSERT INTO order_totals (transaction_number, userid, total_amount) VALUES (?, ?, ?)");
+    // Generate a unique token
+    $token = bin2hex(random_bytes(16));
+
+    // Insert into orders table
+    $stmt = $link->prepare("INSERT INTO orders (transaction_number, userid, total_amount, order_status) VALUES (?, ?, ?, 'Pending')");
     $stmt->bind_param("sid", $transaction_number, $verifiedUID, $total_price);
     $stmt->execute();
     $stmt->close();
 
-    // Insert into orders table
+    // Insert into order_list table
     foreach ($cart_items as $item) {
-        $stmt = $link->prepare("INSERT INTO orders (userid, product_id, prod_size, quantity, total_price, order_status, transaction_number) VALUES (?, ?, ?, ?, ?, 'Pending', ?)");
-        $stmt->bind_param("iisids", $verifiedUID, $item['product_id'], $item['prod_size'], $item['quantity'], $item['row_total'], $transaction_number);
+        $stmt = $link->prepare("INSERT INTO order_list (userid, product_id, prod_size, quantity, total_price, transaction_number) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("iiisds", $verifiedUID, $item['product_id'], $item['prod_size'], $item['quantity'], $item['row_total'], $transaction_number);
         $stmt->execute();
         $stmt->close();
     }
@@ -62,10 +64,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['action'] == 'checkout') {
     $stmt->execute();
     $stmt->close();
 
-    echo "Checkout successful!";
+    echo json_encode([
+        "success" => true,
+        "message" => "Checkout successful. Your transaction number is: $transaction_number",
+        "transaction_number" => $transaction_number,
+        "userid" => $verifiedUID,
+        "token" => $token
+    ]);
     $link->close();
 } else {
-    echo "Invalid request.";
+    echo json_encode(["success" => false, "message" => "Invalid request."]);
 }
 
 function getProductPrice($product_id) {
