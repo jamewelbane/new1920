@@ -181,15 +181,21 @@ $stmtCart->close();
 				// Get the value of the note textarea
 				var note = document.getElementById('note').value;
 
+				// Get the proof of payment image file
+				var proofOfPaymentFile = document.getElementById('proofOfPayment').files[0];
+
+				// Prepare form data to send to checkout script
+				var formData = new FormData();
+				formData.append('action', 'checkout');
+				formData.append('note', note);
+				formData.append('proof_of_payment', proofOfPaymentFile);
+
 				// Proceed with checkout
 				fetch('function/checkout.php', {
 						method: 'POST',
-						headers: {
-							'Content-Type': 'application/x-www-form-urlencoded'
-						},
-						body: 'action=checkout&note=' + encodeURIComponent(note)
+						body: formData
 					})
-					.then(response => response.json()) // Expect a JSON response
+					.then(response => response.json())
 					.then(data => {
 						alert(data.message);
 						if (data.success) {

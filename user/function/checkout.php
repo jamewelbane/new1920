@@ -11,12 +11,8 @@ if (!isset($_SESSION['userid'])) {
 $verifiedUID = $_SESSION['userid'];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['action'] == 'checkout') {
-
-    if (!isset($_POST['note'])) {
-        $note = "None";
-    }
-
-    $note = $_POST['note'];
+    // Check if a note is provided
+    $note = isset($_POST['note']) ? $_POST['note'] : "";
 
     // Fetch cart details
     $query = "SELECT product_id, prod_size, quantity FROM cart WHERE userid = ?";
@@ -62,6 +58,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['action'] == 'checkout') {
         $stmt->close();
     }
 
+    // Handle image upload
+    if (isset($_FILES['proof_of_payment']) && $_FILES['proof_of_payment']['error'] === UPLOAD_ERR_OK) {
+        $target_dir = "../../user/assets/proof-payment/";
+        $target_file = $target_dir . basename($_FILES["proof_of_payment"]["name"]);
+        if (move_uploaded_file($_FILES["proof_of_payment"]["tmp_name"], $target_file)) {
+            // Image uploaded successfully, update the imgURL column in the orders table
+            $imgURL = "../../user/assets/proof-payment/" . basename($_FILES["proof_of_payment"]["name"]);
+            $stmt = $link->prepare("UPDATE orders SET imgURL = ? WHERE transaction_number = ?");
+            $stmt->bind_param("ss", $imgURL, $transaction_number);
+            $stmt->execute();
+            $stmt->close();
+        } else {
+            // Error uploading image
+            echo json_encode(['success' => false, 'message' => 'Error uploading proof of payment.']);
+            exit;
+        }
+    }
+
     // Clear the cart after checkout
     $stmt = $link->prepare("DELETE FROM cart WHERE userid = ?");
     $stmt->bind_param("i", $verifiedUID);
@@ -102,4 +116,3 @@ function getProductPrice($product_id)
 
     return $price;
 }
-?>
