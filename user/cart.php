@@ -135,17 +135,17 @@ mysqli_close($link);
 									</tr>
 									<tr class="total-data">
 										<td><strong>Shipping: </strong></td>
-										<td>₱60.00</td>
+										<td>₱0.00</td>
 									</tr>
 									<tr class="total-data">
 										<td><strong>Total: </strong></td>
-										<td id="total">₱60.00</td>
+										<td id="total">₱0.00</td>
 									</tr>
 								</tbody>
 							</table>
 							<div class="cart-buttons">
 								<a onclick="window.location.reload()" class="boxed-btn">Update Cart</a>
-								<a class="boxed-btn black">Check Out</a>
+								<a class="boxed-btn black" id="checkoutButton">Check Out</a>
 							</div>
 						</div>
 
@@ -256,7 +256,7 @@ mysqli_close($link);
 							subtotal += parseFloat(item.row_total.replace(/[^0-9.-]+/g, ""));
 						});
 
-						var shippingFee = 60.00;
+						var shippingFee = 0;
 						var total = subtotal + shippingFee;
 						document.getElementById('subtotal').innerText = `₱${subtotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
 						document.getElementById('total').innerText = `₱${total.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
@@ -299,6 +299,31 @@ mysqli_close($link);
 			};
 			xhr.send("cart_id=" + cartId + "&product_id=" + productId + "&quantity=" + quantity);
 		}
+	</script>
+
+
+
+	<!-- checkout button -->
+	<script>
+		document.getElementById('checkoutButton').addEventListener('click', function() {
+			if (confirm('Are you sure you want to proceed with the checkout?')) {
+				// Proceed with checkout
+				fetch('function/checkout.php', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						},
+						body: 'action=checkout'
+					})
+					.then(response => response.text())
+					.then(data => {
+						alert(data);
+						
+						window.location.href = 'cart';
+					})
+					.catch(error => console.error('Error:', error));
+			}
+		});
 	</script>
 </body>
 

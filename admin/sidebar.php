@@ -36,6 +36,23 @@
       </div>
     </li>
 
+    <li class="nav-item menu-items">
+      <a class="nav-link" data-toggle="collapse" href="#ui-orders" aria-expanded="false" aria-controls="ui-orders">
+        <span class="menu-icon">
+        <i class="mdi mdi-store"></i>
+        </span>
+        <span class="menu-title">Orders</span>
+        <i class="menu-arrow"></i>
+      </a>
+      <div class="collapse" id="ui-orders">
+        <ul class="nav flex-column sub-menu">
+          <li class="nav-item"> <a class="nav-link" href="orders-pending">Pending</a></li>
+          <li class="nav-item"> <a class="nav-link" href="#">To ship</a></li>
+          <li class="nav-item"> <a class="nav-link" href="#">Completed</a></li>
+        </ul>
+      </div>
+    </li>
+
 
     <li class="nav-item menu-items">
       <a class="nav-link" href="error-404.html">

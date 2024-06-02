@@ -2,7 +2,7 @@
 session_start();
 require '../../database/connection.php';
 
-$userid = $_SESSION['userid']; // Assuming user ID is stored in session
+$userid = $_SESSION['userid']; 
 
 if (!isset($userid)) {
     echo json_encode(['status' => 'error', 'message' => 'User not logged in']);
