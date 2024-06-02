@@ -307,24 +307,11 @@ mysqli_close($link);
 	<script>
 		document.getElementById('checkoutButton').addEventListener('click', function() {
 			if (confirm('Proceed with checkout?')) {
-				// Proceed with checkout
-				fetch('function/checkout.php', {
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/x-www-form-urlencoded'
-						},
-						body: 'action=checkout'
-					})
-					.then(response => response.json()) // Expect a JSON response
-					.then(data => {
-						alert(data.message);
-						if (data.success) {
-							window.location.href = `payment.php?transaction_number=${data.transaction_number}&userid=${data.userid}&token=${data.token}`;
-						}
-					})
-					.catch(error => console.error('Error:', error));
+				// Redirect to payment page
+				window.location.href = `payment.php?userid=${<?php echo $_SESSION['userid']; ?>}`;
 			}
 		});
+	</script>
 	</script>
 </body>
 

@@ -4,13 +4,20 @@ require_once '../../database/connection.php';
 
 // Verify if user is logged in
 if (!isset($_SESSION['userid'])) {
-    echo json_encode(["success" => false, "message" => "You need to log in first."]);
+    echo json_encode(['success' => false, 'message' => 'You need to log in first.']);
     exit;
 }
 
 $verifiedUID = $_SESSION['userid'];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['action'] == 'checkout') {
+
+    if (!isset($_POST['note'])) {
+        $note = "None";
+    }
+
+    $note = $_POST['note'];
+
     // Fetch cart details
     $query = "SELECT product_id, prod_size, quantity FROM cart WHERE userid = ?";
     $stmt = $link->prepare($query);
@@ -18,14 +25,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['action'] == 'checkout') {
     $stmt->execute();
     $result = $stmt->get_result();
 
-    // Calculate total price (using the updated getProductPrice function)
+    // Calculate total price
     $total_price = 0;
     $cart_items = [];
     while ($row = $result->fetch_assoc()) {
         $product_id = $row['product_id'];
         $prod_size = $row['prod_size'];
         $quantity = $row['quantity'];
-        $price = getProductPrice($product_id); // Use the updated function to get the product price
+        $price = getProductPrice($product_id);
         $row_total = $price * $quantity;
         $total_price += $row_total;
 
@@ -41,16 +48,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['action'] == 'checkout') {
     // Generate a unique transaction number
     $transaction_number = uniqid('txn_');
 
-    // Generate a unique token
-    $token = bin2hex(random_bytes(16));
-
-    // Insert into orders table
-    $stmt = $link->prepare("INSERT INTO orders (transaction_number, userid, total_amount, order_status) VALUES (?, ?, ?, 'Pending')");
-    $stmt->bind_param("sid", $transaction_number, $verifiedUID, $total_price);
+    // Insert into order_totals table
+    $stmt = $link->prepare("INSERT INTO orders (transaction_number, userid, total_amount, note, order_status) VALUES (?, ?, ?, ?, 'Pending')");
+    $stmt->bind_param("sids", $transaction_number, $verifiedUID, $total_price, $note);
     $stmt->execute();
     $stmt->close();
 
-    // Insert into order_list table
+    // Insert into orders table
     foreach ($cart_items as $item) {
         $stmt = $link->prepare("INSERT INTO order_list (userid, product_id, prod_size, quantity, total_price, transaction_number) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt->bind_param("iiisds", $verifiedUID, $item['product_id'], $item['prod_size'], $item['quantity'], $item['row_total'], $transaction_number);
@@ -64,19 +68,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['action'] == 'checkout') {
     $stmt->execute();
     $stmt->close();
 
-    echo json_encode([
-        "success" => true,
-        "message" => "Checkout successful. Your transaction number is: $transaction_number",
-        "transaction_number" => $transaction_number,
-        "userid" => $verifiedUID,
-        "token" => $token
-    ]);
+    echo json_encode(['success' => true, 'message' => 'Checkout successful. Your transaction number is: ' . $transaction_number, 'transaction_number' => $transaction_number, 'userid' => $verifiedUID]);
     $link->close();
 } else {
-    echo json_encode(["success" => false, "message" => "Invalid request."]);
+    echo json_encode(['success' => false, 'message' => 'Invalid request.']);
 }
 
-function getProductPrice($product_id) {
+function getProductPrice($product_id)
+{
     global $link;
     // Fetch the price from the products table
     $query = "SELECT price FROM products WHERE product_id = ?";

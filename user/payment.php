@@ -17,43 +17,28 @@ if (!check_login_user_universal($link)) {
 }
 
 
-$transaction_number = $_GET['transaction_number'];
-$userid = $_GET['userid'];
-
 // Fetch user information
-$user_info_query = "SELECT name, address, email, phone_number FROM user_info WHERE user_id = ?";
-$stmt_user_info = $link->prepare($user_info_query);
-$stmt_user_info->bind_param("i", $userid);
-$stmt_user_info->execute();
-$user_info_result = $stmt_user_info->get_result();
-$user_info = $user_info_result->fetch_assoc();
-$stmt_user_info->close();
+$userQuery = "SELECT name, address, email, phone_number FROM user_info WHERE user_id = ?";
+$stmtUser = $link->prepare($userQuery);
+$stmtUser->bind_param("i", $verifiedUID);
+$stmtUser->execute();
+$resultUser = $stmtUser->get_result();
+$userInfo = $resultUser->fetch_assoc();
+$stmtUser->close();
 
-// Fetch order details
-$order_list_query = "SELECT product_id, prod_size, quantity, total_price FROM order_list WHERE transaction_number = ?";
-$stmt_order_list = $link->prepare($order_list_query);
-$stmt_order_list->bind_param("s", $transaction_number);
-$stmt_order_list->execute();
-$order_list_result = $stmt_order_list->get_result();
-$order_items = [];
-while ($row = $order_list_result->fetch_assoc()) {
-	// Fetch product name
-	$product_id = $row['product_id'];
-	$prod_name_query = "SELECT prod_name FROM products WHERE product_id = ?";
-	$stmt_prod_name = $link->prepare($prod_name_query);
-	$stmt_prod_name->bind_param("i", $product_id);
-	$stmt_prod_name->execute();
-	$result_prod_name = $stmt_prod_name->get_result();
-	$prod_name_row = $result_prod_name->fetch_assoc(); // Fetching the row
-	$prod_name = $prod_name_row['prod_name']; // Extracting the product name
-	$stmt_prod_name->close();
+// Fetch cart items
+$cartQuery = "SELECT product_id, prod_size, quantity FROM cart WHERE userid = ?";
+$stmtCart = $link->prepare($cartQuery);
+$stmtCart->bind_param("i", $verifiedUID);
+$stmtCart->execute();
+$resultCart = $stmtCart->get_result();
 
-	$row['prod_name'] = $prod_name; // Add product name to the row
-	$order_items[] = $row;
+$cart_items = [];
+while ($row = $resultCart->fetch_assoc()) {
+	$cart_items[] = $row;
 }
-$stmt_order_list->close();
+$stmtCart->close();
 
-$link->close();
 
 ?>
 
@@ -105,12 +90,12 @@ $link->close();
 								<div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
 									<div class="card-body">
 										<div class="billing-address-form">
-											<form>
-												<p><input type="text" value="<?php echo htmlspecialchars($user_info['name']); ?>" readonly></p>
-												<p><input type="email" value="<?php echo htmlspecialchars($user_info['email']); ?>" readonly></p>
-												<p><input type="text" value="<?php echo htmlspecialchars($user_info['address']); ?>" readonly></p>
-												<p><input type="tel" value="<?php echo htmlspecialchars($user_info['phone_number']); ?>" readonly></p>
-												<p><textarea name="order_note" id="bill" cols="30" rows="10" placeholder="Note"></textarea></p>
+											<form id="orderForm">
+												<p><input type="text" value="<?php echo htmlspecialchars($userInfo['name']); ?>" readonly></p>
+												<p><input type="email" value="<?php echo htmlspecialchars($userInfo['email']); ?>" readonly></p>
+												<p><input type="text" value="<?php echo htmlspecialchars($userInfo['address']); ?>" readonly></p>
+												<p><input type="tel" value="<?php echo htmlspecialchars($userInfo['phone_number']); ?>" readonly></p>
+												<p><textarea name="note" id="note" cols="30" rows="10" placeholder="Note"></textarea></p>
 											</form>
 										</div>
 									</div>
@@ -127,8 +112,10 @@ $link->close();
 								<div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
 									<div class="card-body">
 										<div class="card-details">
-											<p>Your card details goes here.</p>
+											<p>Upload Proof of Payment:</p>
+											<input type="file" id="proofOfPayment" accept="image/*">
 										</div>
+
 									</div>
 								</div>
 							</div>
@@ -141,31 +128,44 @@ $link->close();
 							<thead>
 								<tr>
 									<th>Your Order Details</th>
-									<th>Final price</th>
+									<th>Price</th>
 								</tr>
 							</thead>
 							<tbody class="order-details-body">
-								<?php foreach ($order_items as $item) :
+								<?php foreach ($cart_items as $item) :
 
+									$product_id = $item['product_id'];
+									// Fetch product name
+									$prod_nameQuery = "SELECT prod_name FROM products WHERE Product_id = ?";
+									$stmtProd_name = $link->prepare($prod_nameQuery);
+									$stmtProd_name->bind_param("i", $product_id);
+									$stmtProd_name->execute();
+									$resultProd_name = $stmtProd_name->get_result();
+									$prod_name_row = $resultProd_name->fetch_assoc(); // Fetching the row
+									$prod_name = $prod_name_row['prod_name']; // Extracting the product name
+									$stmtProd_name->close();
+
+									$price = getProductPrice($product_id); // Use the updated function to get the product price
+									$row_total = $price * $item['quantity'];
 								?>
 									<tr>
-										<td><?php echo htmlspecialchars($item['prod_name'] . '-' . $item['prod_size'] . ', ' . $item['quantity'] . ' pair'); ?></td>
-										<td>₱<?php echo number_format($item['total_price'], 2); ?></td>
+										<td><?php echo htmlspecialchars($prod_name . ' | ' . $item['prod_size'] . ' | ' . $item['quantity'] . ' pair'); ?></td>
+										<td>₱<?php echo number_format($row_total, 2); ?></td>
 									</tr>
 								<?php endforeach; ?>
 							</tbody>
 							<tbody class="checkout-details">
 								<tr>
 									<td>Subtotal</td>
-									<td>₱<?php echo number_format(array_sum(array_column($order_items, 'total_price')), 2); ?></td>
+									<td>₱<?php echo number_format(array_sum(array_column($cart_items, 'total_price')), 2); ?></td>
 								</tr>
 								<tr>
 									<td>Total</td>
-									<td>₱<?php echo number_format(array_sum(array_column($order_items, 'total_price')), 2); ?></td>
+									<td>₱<?php echo number_format(array_sum(array_column($cart_items, 'total_price')), 2); ?></td>
 								</tr>
 							</tbody>
 						</table>
-						<a href="#" class="boxed-btn">Place Order</a>
+						<a class="boxed-btn" id="placeOrderButton">Place Order</a>
 					</div>
 				</div>
 			</div>
@@ -175,7 +175,31 @@ $link->close();
 
 
 
+	<script>
+		document.getElementById('placeOrderButton').addEventListener('click', function() {
+			if (confirm('Proceed with placing your order?')) {
+				// Get the value of the note textarea
+				var note = document.getElementById('note').value;
 
+				// Proceed with checkout
+				fetch('function/checkout.php', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						},
+						body: 'action=checkout&note=' + encodeURIComponent(note)
+					})
+					.then(response => response.json()) // Expect a JSON response
+					.then(data => {
+						alert(data.message);
+						if (data.success) {
+							window.location.href = 'shop';
+						}
+					})
+					.catch(error => console.error('Error:', error));
+			}
+		});
+	</script>
 
 
 
@@ -191,3 +215,34 @@ include 'injectables.html';
 ?>
 
 </html>
+
+<?php
+function getProductPrice($product_id)
+{
+	global $link;
+	// Fetch the price from the products table
+	$query = "SELECT price FROM products WHERE product_id = ?";
+	$stmt = $link->prepare($query);
+	$stmt->bind_param("i", $product_id);
+	$stmt->execute();
+	$stmt->bind_result($price);
+	$stmt->fetch();
+	$stmt->close();
+
+	// Check if the product is on discount and get the discount rate
+	$query = "SELECT onDiscount, Discount FROM product_data WHERE product_id = ?";
+	$stmt = $link->prepare($query);
+	$stmt->bind_param("i", $product_id);
+	$stmt->execute();
+	$stmt->bind_result($onDiscount, $discount);
+	$stmt->fetch();
+	$stmt->close();
+
+	// Apply discount if the product is on sale
+	if ($onDiscount == 1) {
+		$price = $price - ($price * ($discount / 100));
+	}
+
+	return $price;
+}
+?>
