@@ -44,16 +44,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['action'] == 'checkout') {
     // Generate a unique transaction number
     $transaction_number = uniqid('txn_');
 
-    // Insert into order_totals table
+    // Insert into orders table
     $stmt = $link->prepare("INSERT INTO orders (transaction_number, userid, total_amount, note, order_status) VALUES (?, ?, ?, ?, 'Pending')");
     $stmt->bind_param("sids", $transaction_number, $verifiedUID, $total_price, $note);
     $stmt->execute();
     $stmt->close();
 
-    // Insert into orders table
+    // Insert into order_list table and decrement stock in product_inventory
     foreach ($cart_items as $item) {
         $stmt = $link->prepare("INSERT INTO order_list (userid, product_id, prod_size, quantity, total_price, transaction_number) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt->bind_param("iiisds", $verifiedUID, $item['product_id'], $item['prod_size'], $item['quantity'], $item['row_total'], $transaction_number);
+        $stmt->execute();
+        $stmt->close();
+
+        // Decrement the stock in product_inventory
+        $stmt = $link->prepare("UPDATE product_inventory SET stock = stock - ? WHERE product_id = ? AND prod_size = ?");
+        $stmt->bind_param("iis", $item['quantity'], $item['product_id'], $item['prod_size']);
         $stmt->execute();
         $stmt->close();
     }
@@ -61,10 +67,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['action'] == 'checkout') {
     // Handle image upload
     if (isset($_FILES['proof_of_payment']) && $_FILES['proof_of_payment']['error'] === UPLOAD_ERR_OK) {
         $target_dir = "../../user/assets/proof-payment/";
-        $target_file = $target_dir . basename($_FILES["proof_of_payment"]["name"]);
+        $unique_id = uniqid();
+        $target_file = $target_dir . $unique_id . "_" . basename($_FILES["proof_of_payment"]["name"]);
         if (move_uploaded_file($_FILES["proof_of_payment"]["tmp_name"], $target_file)) {
             // Image uploaded successfully, update the imgURL column in the orders table
-            $imgURL = "../user/assets/proof-payment/" . basename($_FILES["proof_of_payment"]["name"]);
+            $imgURL = "../user/assets/proof-payment/" . $unique_id . "_" . basename($_FILES["proof_of_payment"]["name"]);
             $stmt = $link->prepare("UPDATE orders SET imgURL = ? WHERE transaction_number = ?");
             $stmt->bind_param("ss", $imgURL, $transaction_number);
             $stmt->execute();
@@ -116,3 +123,4 @@ function getProductPrice($product_id)
 
     return $price;
 }
+?>
