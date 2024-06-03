@@ -156,6 +156,16 @@
         $(".close-btn").on("click", function() {
             $(".search-area").removeClass("search-active");
         });
+
+
+             // search form
+             $(".user-menu-icon").on("click", function(){
+                $(".user-menu-area").addClass("search-active");
+            });
+    
+            $(".close-btn").on("click", function() {
+                $(".user-menu-area").removeClass("search-active");
+            });
     
     });
 

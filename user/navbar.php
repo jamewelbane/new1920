@@ -23,17 +23,21 @@
 
 							<li><a href="contact.html">Contact</a></li>
 							<li id="shop"><a href="shop">Shop</a>
+							<li><a>User</a></li>
 							</li>
 							<li>
 								<div class="header-icons">
+									
 									<?php if ($isLoggedIn === 1) {
 									?>
+										<a class="mobile-hide shopping-cart" href="cart"><i id="cart" class="fas fa-shopping-cart"></i></a>
+										<a class="mobile-hide"><i class="fas fa-user"></i></a>
 										<a class="login-icon" onclick="logoutConfirmation()">
 											<i class="fas fa-sign-out-alt" >
 												<form id="logoutForm" method="POST" action="function/logout.php">
 												</form>
 											</i>
-											<a class="mobile-hide shopping-cart" href="cart"><i id="cart" class="fas fa-shopping-cart"></i></a>
+											
 										</a>
 									<?php
 									} else { ?>
