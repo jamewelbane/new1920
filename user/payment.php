@@ -132,7 +132,9 @@ $stmtCart->close();
 								</tr>
 							</thead>
 							<tbody class="order-details-body">
-								<?php foreach ($cart_items as $item) :
+								<?php 
+								$total_price = 0;
+								foreach ($cart_items as $item) :
 
 									$product_id = $item['product_id'];
 									// Fetch product name
@@ -147,6 +149,8 @@ $stmtCart->close();
 
 									$price = getProductPrice($product_id); // Use the updated function to get the product price
 									$row_total = $price * $item['quantity'];
+
+									$total_price += $row_total;
 								?>
 									<tr>
 										<td><?php echo htmlspecialchars($prod_name . '-' . $item['prod_size'] . ', ' . $item['quantity'] . ' pair'); ?></td>
@@ -157,11 +161,11 @@ $stmtCart->close();
 							<tbody class="checkout-details">
 								<tr>
 									<td>Subtotal</td>
-									<td>₱<?php echo number_format(array_sum(array_column($cart_items, 'total_price')), 2); ?></td>
+									<td>₱<?php echo number_format($total_price, 2); ?></td>
 								</tr>
 								<tr>
 									<td>Total</td>
-									<td>₱<?php echo number_format(array_sum(array_column($cart_items, 'total_price')), 2); ?></td>
+									<td>₱<?php echo number_format($total_price, 2); ?></td>
 								</tr>
 							</tbody>
 						</table>
@@ -174,11 +178,10 @@ $stmtCart->close();
 	<!-- end check out section -->
 
 
-
 	<script>
 		document.getElementById('placeOrderButton').addEventListener('click', function() {
 			if (confirm('Proceed with placing your order?')) {
-		
+				// Get the value of the note textarea
 				var note = document.getElementById('note').value;
 
 				// Get the proof of payment image file
@@ -194,9 +197,9 @@ $stmtCart->close();
 				var formData = new FormData();
 				formData.append('action', 'checkout');
 				formData.append('note', note);
-				formData.append('proof_of_payment', proofOfPaymentFile, imageName); // Append the image with the new name
+				formData.append('proof_of_payment', proofOfPaymentFile, imageName);
 
-			
+				// Proceed with checkout
 				fetch('function/checkout.php', {
 						method: 'POST',
 						body: formData

@@ -89,7 +89,7 @@ if (!check_login_user_universal($link)) {
 
                                                     if ($status === 'Pending') {
                                                         $status = '<label class="badge badge-warning">Pending</label>';
-                                                    } 
+                                                    }
 
                                                     echo "<tr>
                                                         <td>{$row['order_id']}</td>
@@ -99,9 +99,10 @@ if (!check_login_user_universal($link)) {
                                                         <td>{$createdAt}</td>
                                                         <td>{$status}</td>
                                                         <td>
-                                                            <button type='button' data-txn='{$row['transaction_number']}' class='view-order btn btn-primary btn-md'>List <i class='fas fa-clipboard-list'></i></button>
-                                                            <button type='button' data-userid='{$row['userid']}' class='view-user btn btn-info btn-md'>Info <i class='fas fa-user'></i></button>
-                                                            <button type='button' data-userid='{$row['userid']}' class='email-user btn btn-success btn-md'>Email <i class='fas fa-envelope'></i></button>
+                                                            <button type='button' data-txn='{$row['transaction_number']}' class='view-order btn btn-primary btn-md'><i class='fas fa-shopping-cart'></i></button>
+                                                            <button type='button' data-userid='{$row['userid']}' class='view-user btn btn-info btn-md'><i class='fas fa-user'></i></button>
+                                                            <button type='button' data-userid='{$row['userid']}' class='email-user btn btn-success btn-md'><i class='fas fa-envelope'></i></button>
+                                                            <button type='button' data-userid='{$row['order_id']}' class='proof-payment btn btn-info btn-md'><i class='fas fa-file-invoice-dollar'></i></button>
                                                         </td>
                                                     </tr>";
                                                 }
@@ -132,6 +133,7 @@ if (!check_login_user_universal($link)) {
 
     <?php include("assets/injectables.html"); ?>
 </body>
+
 <script>
     $(function() {
         // Use event delegation for the click event
@@ -172,6 +174,51 @@ if (!check_login_user_universal($link)) {
         </div>
     </div>
 </div>
+
+
+<!-- proof of payment -->
+<script>
+    $(function() {
+        // Use event delegation for the click event
+        $(document).on('click', '.proof-payment', function() {
+            var txn = $(this).data('txn');
+            $.ajax({
+                url: 'function/proof-payment.php',
+                type: 'post',
+                data: {
+                    txn: txn
+                },
+                success: function(response) {
+                    $('.ordermodalbody').html(response);
+                    $('#orderModal').modal('show');
+
+                    $(document).on('click', '#close-btn', function() {
+                        $('#orderModal').modal('hide');
+                    });
+                }
+            });
+        });
+    });
+</script>
+
+
+<!-- Modal for proof of payment -->
+<div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="editQuestionModalModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Inventory</h5>
+                <button type="button" class="close" id="close-btn" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="ordermodalbody modal-body">
+
+                <!-- Content will be loaded here from edit-temp-question.php -->
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <!-- datatable -->
 
 <script src="https://cdn.datatables.net/2.0.7/js/dataTables.min.js"></script>
