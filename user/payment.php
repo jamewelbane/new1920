@@ -17,6 +17,17 @@ if (!check_login_user_universal($link)) {
 }
 
 
+// Fetch user payment details
+$isActive = 1;
+$payQuery = "SELECT account_number FROM payment_details WHERE isActive = ?";
+$stmtPay = $link->prepare($payQuery);
+$stmtPay->bind_param("i", $isActive);
+$stmtPay->execute();
+$resultPay = $stmtPay->get_result();
+$payDetails = $resultPay->fetch_assoc();
+$stmtPay->close();
+
+
 // Fetch user information
 $userQuery = "SELECT name, address, email, phone_number FROM user_info WHERE user_id = ?";
 $stmtUser = $link->prepare($userQuery);
@@ -112,6 +123,14 @@ $stmtCart->close();
 								<div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
 									<div class="card-body">
 										<div class="card-details">
+											<p style="font-weight: bold">Payment instruction</p>
+											<p>1. <span style="font-weight: bold">Open GCash App:</span> Log in with your mobile number and PIN.</p>
+											<p>2. <span style="font-weight: bold">Send Money:</span> Tap 'Send Money' > 'Express Send'.</p>
+											<p>3. <span style="font-weight: bold">Enter Details:</span> Send payment to "<?php echo htmlspecialchars($payDetails['account_number']); ?>" and confirm.</p>
+											<p>4. <span style="font-weight: bold">Screenshot:</span> Take a screenshot of the transaction receipt.</p>
+											<p>5. <span style="font-weight: bold">Upload Receipt:</span> Upload the screenshot for order confirmation.</p>
+											<p style="margin-top: 10px; margin-bottom:10px;"><small muted><i><span style="font-weight: bold">*Note:</span> Orders without a receipt will be cancelled.</i></small></p>
+											<p style="margin-top: 10px; margin-bottom:10px;"><small muted><i><span style="font-weight: bold">*Note:</span> This payment does not include the shipping fee. An additional delivery fee will be required once your order is confirmed.</i></small></p>
 											<p>Upload Proof of Payment:</p>
 											<input type="file" id="proofOfPayment" accept="image/*">
 										</div>
@@ -132,7 +151,7 @@ $stmtCart->close();
 								</tr>
 							</thead>
 							<tbody class="order-details-body">
-								<?php 
+								<?php
 								$total_price = 0;
 								foreach ($cart_items as $item) :
 
@@ -179,6 +198,8 @@ $stmtCart->close();
 
 
 	<script>
+		var name; // Initialize the name variable
+
 		document.getElementById('placeOrderButton').addEventListener('click', function() {
 			if (confirm('Proceed with placing your order?')) {
 				// Get the value of the note textarea
@@ -186,6 +207,11 @@ $stmtCart->close();
 
 				// Get the proof of payment image file
 				var proofOfPaymentFile = document.getElementById('proofOfPayment').files[0];
+
+				if (!proofOfPaymentFile) {
+					alert('Please upload a proof of payment file.');
+					return; // Exit the function if no file is selected
+				}
 
 				// Generate a unique identifier for the image name
 				var uniqueIdentifier = Date.now(); // Using timestamp as the unique identifier
@@ -215,6 +241,7 @@ $stmtCart->close();
 			}
 		});
 	</script>
+
 
 
 

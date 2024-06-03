@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['action'] == 'checkout') {
         $target_file = $target_dir . basename($_FILES["proof_of_payment"]["name"]);
         if (move_uploaded_file($_FILES["proof_of_payment"]["tmp_name"], $target_file)) {
             // Image uploaded successfully, update the imgURL column in the orders table
-            $imgURL = "../../user/assets/proof-payment/" . basename($_FILES["proof_of_payment"]["name"]);
+            $imgURL = "../user/assets/proof-payment/" . basename($_FILES["proof_of_payment"]["name"]);
             $stmt = $link->prepare("UPDATE orders SET imgURL = ? WHERE transaction_number = ?");
             $stmt->bind_param("ss", $imgURL, $transaction_number);
             $stmt->execute();
@@ -116,4 +116,3 @@ function getProductPrice($product_id)
 
     return $price;
 }
-?>

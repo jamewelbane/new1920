@@ -44,7 +44,7 @@ if (!check_login_user_universal($link)) {
                         <div class="col-lg-12 grid-margin stretch-card">
                             <div class="card">
                                 <div class="card-body">
-                                    <h4 class="card-title">Pending Transaction</h4>
+                                    <h4 class="card-title">Completed Transaction</h4>
                                     
                                     <div class="table-responsive">
                                         <table id="productTable" class="table">
@@ -53,8 +53,9 @@ if (!check_login_user_universal($link)) {
                                                     <th>Id</th>
                                                     <th>Txn</th>
                                                     <th>User</th>
-                                                    <th>To pay</th>
+                                                    <th>Paid Amount</th>
                                                     <th>Date Ordered</th>
+                                                    <th>Date Completed</th>
                                                     <th>Status</th>
                                                     <th>Action</th>
                                                 </tr>
@@ -64,7 +65,7 @@ if (!check_login_user_universal($link)) {
 
 
                                                 // Fetch orders
-                                                $query = "SELECT * FROM orders WHERE order_status = 'Pending'";
+                                                $query = "SELECT * FROM orders WHERE order_status = 'Completed'";
                                                 $result = mysqli_query($link, $query);
 
                                                 while ($row = mysqli_fetch_assoc($result)) {
@@ -86,9 +87,10 @@ if (!check_login_user_universal($link)) {
                                                     $transaction_number = $row['transaction_number'];
 
                                                     $createdAt = date('d M Y', strtotime($row['created_at']));
+                                                    $updatedAt = date('d M Y', strtotime($row['updated_at']));
 
-                                                    if ($status === 'Pending') {
-                                                        $status = '<label class="badge badge-warning">Pending</label>';
+                                                    if ($status === 'Completed') {
+                                                        $status = '<label class="badge badge-success">Completed</label>';
                                                     }
 
                                                     echo "<tr>
@@ -97,12 +99,14 @@ if (!check_login_user_universal($link)) {
                                                         <td>{$username}</td>
                                                         <td style='color: green;'>₱" . number_format($row['total_amount'], 2, '.', ',') . "</td>
                                                         <td>{$createdAt}</td>
+                                                        <td>{$updatedAt}</td>
                                                         <td>{$status}</td>
                                                         <td>
-                                                            <button type='button' data-txn='{$row['transaction_number']}' class='view-order btn btn-primary btn-md'><i class='fas fa-shopping-cart'></i></button>
-                                                            <button type='button' data-userid='{$row['userid']}' class='view-user btn btn-info btn-md'><i class='fas fa-user'></i></button>
-                                                            <button type='button' data-userid='{$row['userid']}' class='email-user btn btn-success btn-md'><i class='fas fa-envelope'></i></button>
-                                                            <button type='button' data-order_id='{$row['order_id']}' class='proof-payment btn btn-info btn-md'><i class='fas fa-file-invoice-dollar'></i></button>
+                                                            <button type='button' title='Item list' data-txn='{$row['transaction_number']}' class='view-order btn btn-primary btn-md'><i class='fas fa-shopping-cart'></i></button>
+                                                            <button type='button' title='User info' data-userid='{$row['userid']}' class='view-user btn btn-info btn-md'><i class='fas fa-user'></i></button>
+                
+                                                            <button type='button' title='Proof of Payment' data-order_id='{$row['order_id']}' class='proof-payment btn btn-info btn-md'><i class='fas fa-file-invoice-dollar'></i></button>
+                                                            
                                                         </td>
                                                     </tr>";
                                                 }
@@ -159,12 +163,12 @@ if (!check_login_user_universal($link)) {
 </script>
 
 
-<!-- Modal for cart list -->
+<!-- Modal for inventory -->
 <div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="ModalModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Cart</h5>
+                <h5 class="modal-title">Inventory</h5>
                 <button type="button" class="close" id="close-btn" data-dismiss="modal">&times;</button>
             </div>
             <div class="ordermodalbody modal-body">
@@ -183,7 +187,7 @@ if (!check_login_user_universal($link)) {
         $(document).on('click', '.proof-payment', function() {
             var order_id = $(this).data('order_id');
             $.ajax({
-                url: 'function/proof-payment.php',
+                url: 'function/proof-payment-view.php',
                 type: 'post',
                 data: {
                     order_id: order_id
@@ -207,7 +211,7 @@ if (!check_login_user_universal($link)) {
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Proof Of Payment</h5>
+                <h5 class="modal-title">Proof of Payment</h5>
                 <button type="button" class="close" id="close-btn" data-dismiss="modal">&times;</button>
             </div>
             <div class="proofPaymentModalBody modal-body">

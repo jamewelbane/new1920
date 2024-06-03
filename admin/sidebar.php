@@ -47,8 +47,8 @@
       <div class="collapse" id="ui-orders">
         <ul class="nav flex-column sub-menu">
           <li class="nav-item"> <a class="nav-link" href="orders-pending">Pending</a></li>
-          <li class="nav-item"> <a class="nav-link" href="#">To ship</a></li>
-          <li class="nav-item"> <a class="nav-link" href="#">Completed</a></li>
+          <li class="nav-item"> <a class="nav-link" href="orders-confirmed">Confirmed</a></li>
+          <li class="nav-item"> <a class="nav-link" href="orders-completed">Completed</a></li>
         </ul>
       </div>
     </li>
