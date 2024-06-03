@@ -16,21 +16,15 @@ if (!check_login_user_universal($link)) {
     $isLoggedIn = 1;
 }
 
-$isCartEmpty = 1;
-
-$checkCart = "SELECT * FROM cart WHERE userid = $verifiedUID";
-$resultcheckCart = mysqli_query($link, $checkCart);
 
 
-if (mysqli_num_rows($resultcheckCart) > 0) {
-    $isCartEmpty = 0;
-}
-
-mysqli_free_result($resultcheckCart);
-mysqli_close($link);
 ?>
 <!DOCTYPE html>
 <html lang="en">
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.css">
+
 <?php include 'head.html'; ?>
 <style>
     .delete-cart {
@@ -47,10 +41,22 @@ mysqli_close($link);
     }
 
 
+    .body-tab {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f4f4;
+}
+
     .tab-container {
-        width: 100%;
+        width: 90%;
         max-width: 800px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin: 0 auto;
     }
 
     .tabs {
@@ -95,42 +101,96 @@ mysqli_close($link);
         display: block;
     }
 
+    /* Remove the focus outline */
+    .tab-button:focus {
+        outline: none;
+    }
+
     /* Responsive adjustments */
-    @media (max-width: 600px) {
 
-        .tab-container {
-            margin-bottom: 300px;
-        }
-        .tab-button {
-           
-            flex: 100%;
-            border-bottom: 1px solid #ccc;
-            border-right: none;
-            padding: 15px;
+    @media only screen and (max-width: 767px) {
+        .table-responsive {
+            overflow-x: auto;
         }
 
-        .tabs {
-            border-bottom: none;
+        .table thead {
+            display: none;
         }
 
-        .tab-button.active {
-            border-right: 3px solid #007BFF;
-            border-bottom: none;
-            background-color: #fff;
+        .table tr {
+            display: block;
+            margin-bottom: 10px;
         }
 
-        .tab-content {
-            border-top: none;
-            border-left: none;
+        .table td {
+            display: block;
+            text-align: right;
+            padding-left: 50%;
+            position: relative;
+        }
+
+        .table td:before {
+            content: attr(data-label);
+            position: absolute;
+            left: 10px;
+            width: 50%;
+            padding-right: 10px;
+            white-space: nowrap;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .table td:last-child {
+            text-align: center;
         }
     }
+
+   
+    /* @media only screen and (max-width: 767px) {
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .table thead {
+            display: none;
+        }
+
+        .table tr {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .table td {
+            display: block;
+            text-align: right;
+            padding-left: 50%;
+            position: relative;
+        }
+
+        .table td:before {
+            content: attr(data-label);
+            position: absolute;
+            left: 10px;
+            width: 50%;
+            padding-right: 10px;
+            white-space: nowrap;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .table td:last-child {
+            text-align: center;
+        }
+    } */
+
+    
 </style>
 
 <body>
 
     <?php
 
-    include 'html/pre-loader.html';
+    // include 'html/pre-loader.html';
     include("navbar.php");
 
     ?>
@@ -170,78 +230,32 @@ mysqli_close($link);
     <!-- end breadcrumb section -->
 
 
-    <?php
 
-    if ($isCartEmpty === 0) { ?>
-        <!-- cart -->
-        <div class="cart-section mt-150 mb-150">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-8 col-md-12">
-                        <div class="cart-table-wrap">
-                            <table class="cart-table">
-                                <thead class="cart-table-head">
-                                    <tr class="table-head-row">
-                                        <th class="product-remove"></th>
-                                        <th class="product-image">Product Image</th>
-                                        <th class="product-name">Name</th>
-                                        <th class="product-price">Price</th>
-                                        <th class="product-size">Size</th>
-                                        <th class="product-quantity">Quantity</th>
-                                        <th class="product-row-total">Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="cart-items-tbody">
-                                    <!-- Cart items will be dynamically inserted here -->
-                                </tbody>
-                            </table>
+
+<div class="body-tab">
+ 
+                    <div class="tab-container">
+                        <div class="tabs">
+                            <button class="tab-button active" onclick="openTab(event, 'Tab1')">Pending</button>
+                            <button class="tab-button" onclick="openTab(event, 'Tab2')">To Ship</button>
+                            <button class="tab-button" onclick="openTab(event, 'Tab3')">Completed</button>
                         </div>
-                    </div>
-
-
-                </div>
-            </div>
-        </div>
-        <!-- end cart -->
-
-    <?php
-    } else {
-    ?>
-        <!-- error section -->
-        <div class="full-height-section error-section" style="margin-top: 50px;">
-            
-                <div class="container">
-                    <div class="row">
-                        <div class="col-lg-8 offset-lg-2 text-center">
-                            <div class="tab-container">
-                                <div class="tabs">
-                                    <button class="tab-button active" onclick="openTab(event, 'Tab1')">Pending</button>
-                                    <button class="tab-button" onclick="openTab(event, 'Tab2')">To Ship</button>
-                                    <button class="tab-button" onclick="openTab(event, 'Tab3')">Completed</button>
-                                </div>
-                                <div class="tab-content">
-                                    <div id="Tab1" class="tab-pane active">
-                                        <h2>Content of Tab 1</h2>
-                                        <p>This is the content of the first tab.</p>
-                                    </div>
-                                    <div id="Tab2" class="tab-pane">
-                                        <h2>Content of Tab 2</h2>
-                                        <p>This is the content of the second tab.</p>
-                                    </div>
-                                    <div id="Tab3" class="tab-pane">
-                                        <h2>Content of Tab 3</h2>
-                                        <p>This is the content of the third tab.</p>
-                                    </div>
-                                </div>
+                        <div class="tab-content">
+                            <div id="Tab1" class="tab-pane active">
+                                <h2>Pending Transaction</h2>
+                                <?php include 'function/transaction-table/pending-table.php' ?>
+                            </div>
+                            <div id="Tab2" class="tab-pane">
+                                <h2>Confirmed Transaction</h2>
+                                <?php include 'function/transaction-table/confirmed-table.php' ?>
+                            </div>
+                            <div id="Tab3" class="tab-pane">
+                                <h2>Content of Tab 3</h2>
+                                <?php include 'function/transaction-table/completed-table.php' ?>
                             </div>
                         </div>
-                    
-                </div>
-            </div>
-        </div>
-        <!-- end error section -->
-    <?php } ?>
-
+                    </div>
+                    </div>
 
     <?php
     include 'html/logo-brand.html';
@@ -251,7 +265,7 @@ mysqli_close($link);
 
     include 'injectables.html';
     ?>
-<script>
+    <script>
         function openTab(event, tabId) {
             const tabButtons = document.querySelectorAll('.tab-button');
             const tabPanes = document.querySelectorAll('.tab-pane');
@@ -366,7 +380,18 @@ mysqli_close($link);
             xhr.send("cart_id=" + cartId + "&product_id=" + productId + "&quantity=" + quantity);
         }
     </script>
+    <script src="https://cdn.datatables.net/2.0.7/js/dataTables.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.dataTable').DataTable({
+                "pageLength": 10, // Sets the number of entries per page
+                "lengthChange": false, // Hides the entry dropdown
+                "searching": false, // Hides the search box
+                "pagingType": "full_numbers" // Adds styling to pagination
 
+            });
+        });
+    </script>
 
 
     <!-- checkout button -->
@@ -379,7 +404,7 @@ mysqli_close($link);
         });
     </script>
 
-    
+
 </body>
 
 </html>
