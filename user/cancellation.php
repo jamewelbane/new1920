@@ -5,7 +5,6 @@ require("function/check-login.php");
 
 $isLoggedIn = 0;
 if (!check_login_user_universal($link)) {
-
     $isLoggedIn = 0;
 } else {
     $verifiedUID = $_SESSION['userid'];
@@ -13,15 +12,13 @@ if (!check_login_user_universal($link)) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-
     if (!isset($_GET['order_id'])) {
-       header("Location: transactions");
-       exit;
+        header("Location: transactions");
+        exit; // Exit after redirection
     }
 
     $order_id = $_GET['order_id'];
     $pending_cancellation = 0;
-
 
     $checkOrderQuery = "SELECT * FROM cancellation_request WHERE userid = ? AND order_id = ? AND status = ?";
     $stmtOrder = $link->prepare($checkOrderQuery);
@@ -34,10 +31,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     if ($orderInfo) {
         // Order exists in cancellation_request table
         echo json_encode(['success' => false, 'message' => 'Cancellation request already exists for this order.']);
-        // exit;
+        exit; // Exit after handling the case
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -104,22 +102,61 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
                                 <h2>Cancellation</h2>
 
                                 <p>You have already requested a cancellation for this order. Please wait for approval. Thank you!</p>
-                                <a href="" class="boxed-btn">Return</a>
+                                <a href="transactions" class="boxed-btn">Return</a>
+                            <?php
+                            } else {
+                            ?>
+                                <i class="fas fa-shopping-cart"></i>
+                                <img src="" alt="">
+                                <h2>Cancellation Form</h2>
+
+                                <form>
+                                    <div class="form-group">
+                                        <textarea name="reason" id="reason" style="width: 100%" class="form_input" rows="4" placeholder="Please tell us why you want to cancel your order"></textarea>
+                                        <input type="text" id="order_id_input" value="<?= $order_id ?>" hidden>
+                                    </div>
+                                    <button id="cancellationButton" class="boxed-btn">Submit</button>
+                                </form>
+
+                                <script>
+                                    document.getElementById('cancellationButton').addEventListener('click', function() {
+                                        if (confirm('Proceed with cancelling your order?')) {
+                                            // Get the value of the note textarea
+                                            var reason = document.getElementById('reason').value;
+                                            var order_id_input = document.getElementById('order_id_input').value;
+
+                                            if (!reason) {
+                                                alert('Field empty.');
+                                                return;
+                                            }
+
+                                            // Prepare form data to send to checkout script
+                                            var formData = new FormData();
+                                            formData.append('action', 'cancel-request');
+                                            formData.append('reason', reason);
+                                            formData.append('order_id_input', order_id_input);
+
+                                            // Proceed with checkout
+                                            fetch('function/cancel-request.php', {
+                                                    method: 'POST',
+                                                    body: formData
+                                                })
+                                                .then(response => response.json())
+                                                .then(data => {
+                                                    alert(data.message);
+                                                    if (data.success) {
+                                                        // window.location.href = 'transactions';
+                                                        console.log('Success');
+                                                    }
+                                                })
+                                                .catch(error => console.error('Error:', error));
+                                        }
+                                    });
+                                </script>
                             <?php
                             }
                             ?>
 
-                            <i class="fas fa-shopping-cart"></i>
-                            <img src="" alt="">
-                            <h2>Cancellation Form</h2>
-
-                            <form>
-                                <div class="form-group">
-                                    <textarea name="reason" id="reason" style="width: 100%" class="form_input" rows="4" placeholder="Please tell us why you want to cancel your order"></textarea>
-                                    <input type="text" id="order_id_input" value="<?= $order_id ?>" hidden>
-                                </div>
-                                <button id="cancellationButton" class="boxed-btn">Submit</button>
-                            </form>
 
                         </div>
                     </div>
@@ -149,47 +186,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         };
     </script>
 
-<script>
-		
 
-		document.getElementById('cancellationButton').addEventListener('click', function() {
-			if (confirm('Proceed with cancelling your order?')) {
-				// Get the value of the note textarea
-				var reason = document.getElementById('reason').value;
-                var order_id_input = document.getElementById('order_id_input').value;
-                				
-
-				if (!reason) {
-					alert('Field empty.');
-					return; 
-				}
-
-				
-
-				// Prepare form data to send to checkout script
-				var formData = new FormData();
-				formData.append('action', 'cancel-request');
-				formData.append('reason', reason);
-                formData.append('order_id_input', order_id_input);
-			
-
-				// Proceed with checkout
-				fetch('function/cancel-request.php', {
-						method: 'POST',
-						body: formData
-					})
-					.then(response => response.json())
-					.then(data => {
-						alert(data.message);
-						if (data.success) {
-							// window.location.href = 'transactions';
-                            console.log('Success');
-						}
-					})
-					.catch(error => console.error('Error:', error));
-			}
-		});
-	</script>
 
 </body>
 

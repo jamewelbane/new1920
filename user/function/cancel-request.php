@@ -10,10 +10,11 @@ if (!isset($_SESSION['userid'])) {
 
 $verifiedUID = $_SESSION['userid'];
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['action'] == 'cancel-request') {
-    // Check if a note is provided
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'cancel-request') {
+    // Check if a reason is provided
     $reason = isset($_POST['reason']) ? $_POST['reason'] : "";
 
+    // Check if order_id is provided
     if (!isset($_POST['order_id_input'])) {
         echo json_encode(['success' => false, 'message' => 'Failed to get order details']);
         exit;
@@ -22,26 +23,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['action'] == 'cancel-request'
     $order_id = $_POST['order_id_input'];
 
     // Fetch order details
-    $query = "SELECT * FROM orders WHERE order_id = ?";
+    $query = "SELECT transaction_number FROM orders WHERE order_id = ?";
     $stmt = $link->prepare($query);
     $stmt->bind_param("i", $order_id);
     $stmt->execute();
     $result = $stmt->get_result();
-    $row =  $result->fetch_assoc();
+    $row = $result->fetch_assoc();
+
+    // Check if order exists
+    if (!$row) {
+        echo json_encode(['success' => false, 'message' => 'Order not found']);
+        exit;
+    }
 
     $txn = $row['transaction_number'];
 
     $stmt->close();
 
-     // Insert into orders table
-     $stmt = $link->prepare("INSERT INTO cancellation_request (order_id, txn, user_id, reason) VALUES (?, ?, ?, ?)");
-     $stmt->bind_param("isisi", $order_id, $txn, $verifiedUID, $reason);
-     $stmt->execute();
-     $stmt->close();
-
+    // Insert cancellation request into cancellation_request table
+    $stmt = $link->prepare("INSERT INTO cancellation_request (order_id, txn, userid, reason, status, date) VALUES (?, ?, ?, ?, 0, NOW())");
+    $stmt->bind_param("isis", $order_id, $txn, $verifiedUID, $reason);
+    $stmt->execute();
+    $stmt->close();
 
     echo json_encode(['success' => true, 'message' => 'You have successfully requested a cancellation for order with TXN: ' . $txn, 'transaction_number' => $txn, 'userid' => $verifiedUID]);
     $link->close();
 } else {
     echo json_encode(['success' => false, 'message' => 'Invalid request.']);
 }
+?>

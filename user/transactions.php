@@ -24,182 +24,10 @@ if (!check_login_user_universal($link)) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.css">
+<link rel="stylesheet" href="assets/css/cancellation-page.css">
 
 <?php include 'head.html'; ?>
-<style>
-    .delete-cart {
-        background: transparent;
 
-        border: none;
-
-        color: inherit;
-
-        padding: 10px;
-
-        cursor: pointer;
-
-    }
-
-
-    .body-tab {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        justify-content: center;
-        background-color: #f4f4f4;
-        min-height: 100vh;
-        /* Use padding or margin instead of align-items: center to prevent upward movement */
-        padding-top: 20px;
-        padding-bottom: 20px;
-       
-    }
-
-    .tab-container {
-        width: 100%;
-        max-width: 800px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        background-color: #fff;
-        margin-top: 20px;
-        /* Ensure the tab container has a background color */
-        
-    }
-
-    .tabs {
-        display: flex;
-        flex-wrap: wrap;
-        border-bottom: 1px solid #ccc;
-    }
-
-    .tab-button {
-        flex: 1;
-        padding: 10px;
-        cursor: pointer;
-        background-color: #f4f4f4;
-        border: none;
-        border-bottom: 3px solid transparent;
-        outline: none;
-        transition: background-color 0.3s, border-bottom-color 0.3s;
-        text-align: center;
-    }
-
-    .tab-button:hover {
-        background-color: #e9e9e9;
-    }
-
-    .tab-button.active {
-        border-bottom-color: #007BFF;
-        background-color: #fff;
-    }
-
-    .tab-content {
-        border: 1px solid #ccc;
-        border-top: none;
-        padding: 20px;
-        background-color: #fff;
-    }
-
-    .tab-pane {
-        display: none;
-    }
-
-    .tab-pane.active {
-        display: block;
-    }
-
-    /* Remove the focus outline */
-    .tab-button:focus {
-        outline: none;
-    }
-
-    /* Responsive adjustments */
-    @media only screen and (max-width: 767px) {
-        .body-tab {
-            padding-top: 10px;
-            padding-bottom: 10px;
-        }
-        .tab-container { 
-            width: 90%;
-            
-        }
-        .tab-button {
-            flex: 100%;
-            border-bottom: 1px solid #ccc;
-            border-right: none;
-            padding: 15px;
-        }
-
-        .tabs {
-            border-bottom: none;
-        }
-
-        .tab-button.active {
-            border-right: 3px solid #007BFF;
-            border-bottom: none;
-            background-color: #fff;
-        }
-
-        .tab-content {
-            border-top: none;
-            border-left: none;
-        }
-
-        .cancel_request {
-            margin-top: 10px;
-        }
-    }
-
-    .table-responsive {
-        overflow-x: auto;
-    }
-
-    .table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .table thead {
-        display: none;
-    }
-
-    .table tbody,
-    .table tr,
-    .table td {
-        display: block;
-        width: 100%;
-    }
-
-    .table tr {
-        margin-bottom: 10px;
-        border-bottom: 1px solid #ccc;
-    }
-
-    .table td {
-        text-align: right;
-        padding: 8px;
-        position: relative;
-        border: none;
-    }
-
-    .table td:before {
-        content: attr(data-label);
-        position: absolute;
-        left: 8px;
-        width: 50%;
-        padding-right: 10px;
-        white-space: nowrap;
-        text-align: left;
-        font-weight: bold;
-    }
-
-    .table td:last-child {
-        text-align: center;
-    }
-
-    .table td:last-child:before {
-        content: none;
-    }
-</style>
 
 <body>
 
@@ -421,16 +249,21 @@ if (!check_login_user_universal($link)) {
 
 
 <script>
-document.addEventListener('DOMContentLoaded', (event) => {
-    document.getElementById('cancel_request').addEventListener('click', function() {
-        if (confirm('Cancel this order?')) {
-            
-            var orderId = this.getAttribute('data-order_id');
-            // Redirect to the cancellation page with the order ID
-            window.location.href = 'cancellation.php?order_id=' + orderId;
-        }
+    document.addEventListener('DOMContentLoaded', (event) => {
+        // Get all buttons with class 'cancel_request'
+        var cancelButtons = document.querySelectorAll('.cancel_request');
+        // Loop through each cancel button
+        cancelButtons.forEach(function(button) {
+            // Add event listener to each cancel button
+            button.addEventListener('click', function() {
+                if (confirm('Cancel this order?')) {
+                    var orderId = this.getAttribute('data-order_id');
+                    // Redirect to the cancellation page with the order ID
+                    window.location.href = 'cancellation.php?order_id=' + orderId;
+                }
+            });
+        });
     });
-});
 </script>
 
 
