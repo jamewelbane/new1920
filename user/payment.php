@@ -234,7 +234,7 @@ $stmtCart->close();
 					.then(data => {
 						alert(data.message);
 						if (data.success) {
-							window.location.href = 'shop';
+							window.location.href = 'transactions';
 						}
 					})
 					.catch(error => console.error('Error:', error));

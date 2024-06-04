@@ -105,7 +105,9 @@ function getProductPrice($product_id)
     $stmt->execute();
     $stmt->bind_result($price);
     $stmt->fetch();
-    $stmt->close();
+    $stmt->close(); 
+
+    
 
     // Check if the product is on discount and get the discount rate
     $query = "SELECT onDiscount, Discount FROM product_data WHERE product_id = ?";

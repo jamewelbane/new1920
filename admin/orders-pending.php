@@ -236,5 +236,51 @@ if (!check_login_user_universal($link)) {
 </script>
 
 
+<!-- view user -->
+<script>
+    $(function() {
+        // Use event delegation for the click event
+        $(document).on('click', '.view-user', function() {
+            var userid = $(this).data('userid');
+            $.ajax({
+                url: 'function/view-user.php',
+                type: 'post',
+                data: {
+                    userid: userid
+                },
+                success: function(response) {
+                    $('.viewUserModalBody').html(response);
+                    $('#viewUserModal').modal('show');
+
+                    $(document).on('click', '#close-btn', function() {
+                        $('#viewUserModal').modal('hide');
+                    });
+                }
+            });
+        });
+    });
+</script>
+
+
+<!-- Modal for proof of payment -->
+<div class="modal fade" id="viewUserModal" tabindex="-1" role="dialog" aria-labelledby="ModalModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">User information</h5>
+                <button type="button" class="close" id="close-btn" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="viewUserModalBody modal-body">
+
+                <!-- Content will be loaded here from edit-temp-question.php -->
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
 
 </html>

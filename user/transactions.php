@@ -22,7 +22,7 @@ if (!check_login_user_universal($link)) {
 <!DOCTYPE html>
 <html lang="en">
 <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.css">
 
 <?php include 'head.html'; ?>
@@ -42,21 +42,27 @@ if (!check_login_user_universal($link)) {
 
 
     .body-tab {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #f4f4f4;
-}
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        background-color: #f4f4f4;
+        min-height: 100vh;
+        /* Use padding or margin instead of align-items: center to prevent upward movement */
+        padding-top: 20px;
+        padding-bottom: 20px;
+       
+    }
 
     .tab-container {
-        width: 90%;
+        width: 100%;
         max-width: 800px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        margin: 0 auto;
+        background-color: #fff;
+        margin-top: 20px;
+        /* Ensure the tab container has a background color */
+        
     }
 
     .tabs {
@@ -107,90 +113,99 @@ if (!check_login_user_universal($link)) {
     }
 
     /* Responsive adjustments */
-
     @media only screen and (max-width: 767px) {
-        .table-responsive {
-            overflow-x: auto;
+        .body-tab {
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+        .tab-container { 
+            width: 90%;
+            
+        }
+        .tab-button {
+            flex: 100%;
+            border-bottom: 1px solid #ccc;
+            border-right: none;
+            padding: 15px;
         }
 
-        .table thead {
-            display: none;
+        .tabs {
+            border-bottom: none;
         }
 
-        .table tr {
-            display: block;
-            margin-bottom: 10px;
+        .tab-button.active {
+            border-right: 3px solid #007BFF;
+            border-bottom: none;
+            background-color: #fff;
         }
 
-        .table td {
-            display: block;
-            text-align: right;
-            padding-left: 50%;
-            position: relative;
+        .tab-content {
+            border-top: none;
+            border-left: none;
         }
 
-        .table td:before {
-            content: attr(data-label);
-            position: absolute;
-            left: 10px;
-            width: 50%;
-            padding-right: 10px;
-            white-space: nowrap;
-            text-align: left;
-            font-weight: bold;
-        }
-
-        .table td:last-child {
-            text-align: center;
+        .cancel_request {
+            margin-top: 10px;
         }
     }
 
-   
-    /* @media only screen and (max-width: 767px) {
-        .table-responsive {
-            overflow-x: auto;
-        }
+    .table-responsive {
+        overflow-x: auto;
+    }
 
-        .table thead {
-            display: none;
-        }
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
 
-        .table tr {
-            display: block;
-            margin-bottom: 10px;
-        }
+    .table thead {
+        display: none;
+    }
 
-        .table td {
-            display: block;
-            text-align: right;
-            padding-left: 50%;
-            position: relative;
-        }
+    .table tbody,
+    .table tr,
+    .table td {
+        display: block;
+        width: 100%;
+    }
 
-        .table td:before {
-            content: attr(data-label);
-            position: absolute;
-            left: 10px;
-            width: 50%;
-            padding-right: 10px;
-            white-space: nowrap;
-            text-align: left;
-            font-weight: bold;
-        }
+    .table tr {
+        margin-bottom: 10px;
+        border-bottom: 1px solid #ccc;
+    }
 
-        .table td:last-child {
-            text-align: center;
-        }
-    } */
+    .table td {
+        text-align: right;
+        padding: 8px;
+        position: relative;
+        border: none;
+    }
 
-    
+    .table td:before {
+        content: attr(data-label);
+        position: absolute;
+        left: 8px;
+        width: 50%;
+        padding-right: 10px;
+        white-space: nowrap;
+        text-align: left;
+        font-weight: bold;
+    }
+
+    .table td:last-child {
+        text-align: center;
+    }
+
+    .table td:last-child:before {
+        content: none;
+    }
 </style>
 
 <body>
 
     <?php
 
-    // include 'html/pre-loader.html';
+    include 'html/pre-loader.html';
     include("navbar.php");
 
     ?>
@@ -221,7 +236,7 @@ if (!check_login_user_universal($link)) {
                 <div class="col-lg-8 offset-lg-2 text-center">
                     <div class="breadcrumb-text">
                         <p>Checkout, Complete, Enjoy!</p>
-                        <h1>Cart</h1>
+                        <h1>Transactions</h1>
                     </div>
                 </div>
             </div>
@@ -232,30 +247,30 @@ if (!check_login_user_universal($link)) {
 
 
 
-<div class="body-tab">
- 
-                    <div class="tab-container">
-                        <div class="tabs">
-                            <button class="tab-button active" onclick="openTab(event, 'Tab1')">Pending</button>
-                            <button class="tab-button" onclick="openTab(event, 'Tab2')">To Ship</button>
-                            <button class="tab-button" onclick="openTab(event, 'Tab3')">Completed</button>
-                        </div>
-                        <div class="tab-content">
-                            <div id="Tab1" class="tab-pane active">
-                                <h2>Pending Transaction</h2>
-                                <?php include 'function/transaction-table/pending-table.php' ?>
-                            </div>
-                            <div id="Tab2" class="tab-pane">
-                                <h2>Confirmed Transaction</h2>
-                                <?php include 'function/transaction-table/confirmed-table.php' ?>
-                            </div>
-                            <div id="Tab3" class="tab-pane">
-                                <h2>Content of Tab 3</h2>
-                                <?php include 'function/transaction-table/completed-table.php' ?>
-                            </div>
-                        </div>
-                    </div>
-                    </div>
+    <div class="body-tab">
+
+        <div class="tab-container">
+            <div class="tabs">
+                <button class="tab-button active" onclick="openTab(event, 'Tab1')">Pending</button>
+                <button class="tab-button" onclick="openTab(event, 'Tab2')">To Ship</button>
+                <button class="tab-button" onclick="openTab(event, 'Tab3')">Completed</button>
+            </div>
+            <div class="tab-content">
+                <div id="Tab1" class="tab-pane">
+                    <h2>Pending Orders</h2>
+                    <?php include 'function/transaction-table/pending-table.php' ?>
+                </div>
+                <div id="Tab2" class="tab-pane">
+                    <h2>To ship</h2>
+                    <?php include 'function/transaction-table/confirmed-table.php' ?>
+                </div>
+                <div id="Tab3" class="tab-pane">
+                    <h2>Completed</h2>
+                    <?php include 'function/transaction-table/completed-table.php' ?>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <?php
     include 'html/logo-brand.html';
@@ -265,6 +280,16 @@ if (!check_login_user_universal($link)) {
 
     include 'injectables.html';
     ?>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Get the tab pane you want to set as active
+            var tabPane = document.getElementById("Tab1");
+
+            // Add the 'active' class to the tab pane
+            tabPane.classList.add("active");
+        });
+    </script>
     <script>
         function openTab(event, tabId) {
             const tabButtons = document.querySelectorAll('.tab-button');
@@ -394,15 +419,19 @@ if (!check_login_user_universal($link)) {
     </script>
 
 
-    <!-- checkout button -->
-    <script>
-        document.getElementById('checkoutButton').addEventListener('click', function() {
-            if (confirm('Proceed with checkout?')) {
-                // Redirect to payment page
-                window.location.href = `payment.php?userid=${<?php echo $_SESSION['userid']; ?>}`;
-            }
-        });
-    </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+    document.getElementById('cancel_request').addEventListener('click', function() {
+        if (confirm('Cancel this order?')) {
+            
+            var orderId = this.getAttribute('data-order_id');
+            // Redirect to the cancellation page with the order ID
+            window.location.href = 'cancellation.php?order_id=' + orderId;
+        }
+    });
+});
+</script>
 
 
 </body>

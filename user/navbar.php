@@ -31,7 +31,7 @@
 									<?php if ($isLoggedIn === 1) {
 									?>
 										<a class="mobile-hide shopping-cart" href="cart"><i id="cart" class="fas fa-shopping-cart"></i></a>
-										<a class="mobile-hide"><i class="fas fa-user"></i></a>
+										<a class="mobile-hide" href="transactions"><i id="transac" class="fas fa-exchange-alt"></i></a>
 										<a class="login-icon" onclick="logoutConfirmation()">
 											<i class="fas fa-sign-out-alt" >
 												<form id="logoutForm" method="POST" action="function/logout.php">
