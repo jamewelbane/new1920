@@ -67,21 +67,21 @@ $resultCompletedTransaction = mysqli_stmt_get_result($stmtCompletedTransaction);
 
 $totalPairsSold = 0;
 while ($rowCompletedTransaction = mysqli_fetch_assoc($resultCompletedTransaction)) {
-    $transactionNumber = $rowCompletedTransaction['transaction_number'];
+  $transactionNumber = $rowCompletedTransaction['transaction_number'];
 
 
-    $totalQuantityQuery = "SELECT SUM(quantity) AS total_quantity FROM order_list WHERE transaction_number = ?";
-    $stmtTotalQuantity = mysqli_prepare($link, $totalQuantityQuery);
-    mysqli_stmt_bind_param($stmtTotalQuantity, "s", $transactionNumber);
-    mysqli_stmt_execute($stmtTotalQuantity);
-    $resultTotalQuantity = mysqli_stmt_get_result($stmtTotalQuantity);
-    $rowTotalQuantity = mysqli_fetch_assoc($resultTotalQuantity);
-    
+  $totalQuantityQuery = "SELECT SUM(quantity) AS total_quantity FROM order_list WHERE transaction_number = ?";
+  $stmtTotalQuantity = mysqli_prepare($link, $totalQuantityQuery);
+  mysqli_stmt_bind_param($stmtTotalQuantity, "s", $transactionNumber);
+  mysqli_stmt_execute($stmtTotalQuantity);
+  $resultTotalQuantity = mysqli_stmt_get_result($stmtTotalQuantity);
+  $rowTotalQuantity = mysqli_fetch_assoc($resultTotalQuantity);
 
-    $totalPairsSold += $rowTotalQuantity['total_quantity'];
-    
 
-    mysqli_free_result($resultTotalQuantity);
+  $totalPairsSold += $rowTotalQuantity['total_quantity'];
+
+
+  mysqli_free_result($resultTotalQuantity);
 }
 
 mysqli_free_result($resultCompletedTransaction);
@@ -246,24 +246,7 @@ mysqli_free_result($resultCompletedTransaction);
                   <div class="row">
                     <div class="col-12">
                       <div class="preview-list">
-                        <div class="preview-item border-bottom">
-                          <div class="preview-thumbnail">
-                            <div class="preview-icon bg-primary">
-                              <i class="mdi mdi-book-open-page-variant"></i>
-                            </div>
-                          </div>
-                          <div class="preview-item-content d-sm-flex flex-grow">
-                            <div class="flex-grow">
-                              <h6 class="preview-subject">Performace Chart</h6>
-                              <!-- message -->
-                              <p class="text-muted mb-0">As of 05/14/2024, 03:00 PM</p>
-                              <!-- end -->
-                            </div>
-                            <div class="mr-auto text-sm-right pt-2 pt-sm-0">
-                              <p class="text-muted mb-0">Category </p>
-                            </div>
-                          </div>
-                        </div>
+                        <canvas id="areaChart" style="height:250px"></canvas>
                       </div>
                     </div>
                   </div>
