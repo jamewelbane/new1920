@@ -47,7 +47,7 @@
                                     $refundedAmount = "<span style='color: red;'>₱0.00</span>";
                                 } else if ($cancel_status === 'Pending') {  
                                     $statusLabel = '<label class="badge badge-warning">' . $status . '</label>';
-                                    $refundedAmount = "₱" . number_format($row['total_amount'], 2, '.', ',') . "";
+                                    $refundedAmount = "<span style='color: green;'>Processing</span>";
                                 }
 
                                                 echo "<tr>
