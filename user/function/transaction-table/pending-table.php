@@ -27,25 +27,62 @@
 							$transaction_number = $row['transaction_number'];
 							$createdAt = date('d M Y', strtotime($row['created_at']));
 
+							// Check if there is a pending cancellation request for this order
+							$checkCancellationQuery = "SELECT * FROM cancellation_request WHERE order_id = ? AND status = 0";
+							$stmtCancellation = $link->prepare($checkCancellationQuery);
+							$stmtCancellation->bind_param("i", $order_id);
+							$stmtCancellation->execute();
+							$resultCancellation = $stmtCancellation->get_result();
+							$cancellationExists = $resultCancellation->num_rows > 0;
+							$stmtCancellation->close();
+
 							if ($status === 'Pending') {
-								$status = '<label class="badge badge-warning">Pending</label>';
+								$statusLabel = '<label class="badge badge-warning">Pending</label>';
+							} else {
+								$statusLabel = $status;
 							}
 
 							echo "<tr>
-                    <td data-label='Transaction #'>{$row['transaction_number']}</td>
-                    <td data-label='To pay' style='color: green;'>₱" . number_format($row['total_amount'], 2, '.', ',') . "</td>
-                    <td data-label='Date Ordered'>{$createdAt}</td>
-                    <td data-label='Status'>{$status}</td>
-                    <td data-label='Actions'>
-                        <button type='button' data-txn='{$row['transaction_number']}' class='view-order btn btn-primary btn-md'><i class='fas fa-shopping-cart'></i></button>
-                        <button type='button' class='cancel_request btn btn-danger btn-md' data-order_id='$order_id'>Cancel</button>
-                    </td>
-                </tr>";
+							<td data-label='Transaction #'>{$transaction_number}</td>
+							<td data-label='To pay' style='color: green;'>₱" . number_format($row['total_amount'], 2, '.', ',') . "</td>
+							<td data-label='Date Ordered'>{$createdAt}</td>
+							<td data-label='Status'>";
+
+							if (!$cancellationExists) {
+								echo $statusLabel;
+							} else {
+								echo "<label class='badge badge-secondary'>Cancellation Pending</label>";
+							}
+
+							echo "</td>
+							<td data-label='Actions'>
+								<button type='button' data-txn='{$transaction_number}' class='view-order btn btn-primary btn-md'><i class='fas fa-shopping-cart'></i></button>";
+
+							if (!$cancellationExists) {
+								echo "<button type='button' class='cancel_request btn btn-danger btn-md' data-order_id='$order_id'>Cancel</button>";
+							}
+
+							echo "</td></tr>";
 						}
 
 						$stmtPending->close();
 						?>
 					</tbody>
+
+					<script>
+						document.addEventListener('DOMContentLoaded', (event) => {
+							document.querySelectorAll('.cancel_request').forEach(button => {
+								button.addEventListener('click', function() {
+									if (confirm('Cancel this order?')) {
+										var orderId = this.getAttribute('data-order_id');
+										// Redirect to the cancellation page with the order ID
+										window.location.href = 'cancellation.php?order_id=' + orderId;
+									}
+								});
+							});
+						});
+					</script>
+
 
 				</table>
 			</div>
@@ -54,4 +91,3 @@
 
 	</div>
 </div>
-

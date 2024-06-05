@@ -5,6 +5,7 @@ require_once '../../database/connection.php';
 // Verify if user is logged in
 if (!isset($_SESSION['userid'])) {
     echo json_encode(['success' => false, 'message' => 'You need to log in first.']);
+ 
     exit;
 }
 

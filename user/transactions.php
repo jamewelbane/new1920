@@ -33,7 +33,7 @@ if (!check_login_user_universal($link)) {
 
     <?php
 
-    include 'html/pre-loader.html';
+    // include 'html/pre-loader.html';
     include("navbar.php");
 
     ?>
@@ -82,6 +82,7 @@ if (!check_login_user_universal($link)) {
                 <button class="tab-button active" onclick="openTab(event, 'Tab1')">Pending</button>
                 <button class="tab-button" onclick="openTab(event, 'Tab2')">To Ship</button>
                 <button class="tab-button" onclick="openTab(event, 'Tab3')">Completed</button>
+                <button class="tab-button" onclick="openTab(event, 'Tab4')">Cancellation</button>
             </div>
             <div class="tab-content">
                 <div id="Tab1" class="tab-pane">
@@ -89,12 +90,16 @@ if (!check_login_user_universal($link)) {
                     <?php include 'function/transaction-table/pending-table.php' ?>
                 </div>
                 <div id="Tab2" class="tab-pane">
-                    <h2>To ship</h2>
+                    <h2>To ship Orders</h2>
                     <?php include 'function/transaction-table/confirmed-table.php' ?>
                 </div>
                 <div id="Tab3" class="tab-pane">
-                    <h2>Completed</h2>
+                    <h2>Completed Orders</h2>
                     <?php include 'function/transaction-table/completed-table.php' ?>
+                </div>
+                <div id="Tab4" class="tab-pane">
+                    <h2>Cancellations</h2>
+                    <?php include 'function/transaction-table/cancelled-orders.php' ?>
                 </div>
             </div>
         </div>
@@ -205,7 +210,7 @@ if (!check_login_user_universal($link)) {
         }
 
         window.onload = function() {
-            var cartIcon = document.getElementById("cart");
+            var cartIcon = document.getElementById("transac");
             if (cartIcon) {
                 cartIcon.style.color = "#F28123";
             }

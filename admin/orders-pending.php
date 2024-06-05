@@ -20,7 +20,13 @@ if (!check_login_user_universal($link)) {
 
 
 </head>
-
+<style> 
+@media only screen and (max-width: 767px) {
+    #approve_cancel {
+        margin-top: 10px;
+    }
+}
+</style>
 <body>
 
 
@@ -68,7 +74,7 @@ if (!check_login_user_universal($link)) {
                                                 $result = mysqli_query($link, $query);
 
                                                 while ($row = mysqli_fetch_assoc($result)) {
-
+                                                    
                                                     $userid = $row['userid'];
 
                                                     // Fetch username
@@ -85,11 +91,36 @@ if (!check_login_user_universal($link)) {
                                                     $order_id = $row['order_id'];
                                                     $transaction_number = $row['transaction_number'];
 
+                                                    
+
                                                     $createdAt = date('d M Y', strtotime($row['created_at']));
 
-                                                    if ($status === 'Pending') {
+                                                    // check if the order is pending for cancellation
+                                                    $queryCheckCancellation = "SELECT status FROM cancellation_request WHERE order_id = ?";
+                                                    $stmtqueryCheckCancellation = $link->prepare($queryCheckCancellation);
+
+                                                  
+                                                    $stmtqueryCheckCancellation->bind_param("i", $order_id); 
+                                                
+                                                    $stmtqueryCheckCancellation->execute();
+                                                
+                                                    // Fetch the result
+                                                    $stmtqueryCheckCancellation->bind_result($cancel_order);
+                                                    $stmtqueryCheckCancellation->fetch();
+                                                    if (!isset($cancel_order)) {
+                                                        $cancel_order = 3;
+                                                    }
+
+                                                    echo $cancel_order;
+
+                                                    if ($status === 'Pending' && $cancel_order === 0) {
+                                                        $status = '<label class="badge badge-danger">Cancellation</label>';
+                                                    } else if ($status === 'Pending') {
                                                         $status = '<label class="badge badge-warning">Pending</label>';
                                                     }
+
+
+
 
                                                     echo "<tr>
                                                         <td>{$row['order_id']}</td>
@@ -105,6 +136,7 @@ if (!check_login_user_universal($link)) {
                                                             <button type='button' data-order_id='{$row['order_id']}' class='proof-payment btn btn-info btn-md'><i class='fas fa-file-invoice-dollar'></i></button>
                                                         </td>
                                                     </tr>";
+                                                    $stmtqueryCheckCancellation->close();
                                                 }
 
                                                 mysqli_close($link);

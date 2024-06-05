@@ -30,7 +30,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
     if ($orderInfo) {
         // Order exists in cancellation_request table
-        echo json_encode(['success' => false, 'message' => 'Cancellation request already exists for this order.']);
+
+?>
+        <script>
+            if (confirm('Cancellation request already exists for this order.')) {
+                window.location.href = 'transactions';
+            } else {
+                window.location.href = 'transactions';
+            }
+        </script>
+<?php
+
         exit; // Exit after handling the case
     }
 }
@@ -179,9 +189,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
     <script>
         window.onload = function() {
-            var cartIcon = document.getElementById("transac");
-            if (cartIcon) {
-                cartIcon.style.color = "#F28123";
+            var transactIcon = document.getElementById("transac");
+            if (transactIcon) {
+                transactIcon.style.color = "#F28123";
             }
         };
     </script>
