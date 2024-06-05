@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     $stmt->close();
 
     // Insert cancellation request into cancellation_request table
-    $stmt = $link->prepare("INSERT INTO cancellation_request (order_id, txn, userid, reason, status, date) VALUES (?, ?, ?, ?, 0, NOW())");
+    $stmt = $link->prepare("INSERT INTO cancellation_request (order_id, txn, userid, reason, date) VALUES (?, ?, ?, ?, NOW())");
     $stmt->bind_param("isis", $order_id, $txn, $verifiedUID, $reason);
     $stmt->execute();
     $stmt->close();

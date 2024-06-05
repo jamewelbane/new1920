@@ -20,13 +20,16 @@ if (!check_login_user_universal($link)) {
 
 
 </head>
-<style> 
-@media only screen and (max-width: 767px) {
-    #approve_cancel {
-        margin-top: 10px;
+<style>
+    @media only screen and (max-width: 767px) {
+        #approve_cancel {
+            margin-top: 10px;
+        }
     }
-}
+
+ 
 </style>
+
 <body>
 
 
@@ -51,7 +54,7 @@ if (!check_login_user_universal($link)) {
                             <div class="card">
                                 <div class="card-body">
                                     <h4 class="card-title">Pending Transaction</h4>
-                                    
+
                                     <div class="table-responsive">
                                         <table id="productTable" class="table">
                                             <thead>
@@ -67,14 +70,11 @@ if (!check_login_user_universal($link)) {
                                             </thead>
                                             <tbody>
                                                 <?php
-
-
                                                 // Fetch orders
                                                 $query = "SELECT * FROM orders WHERE order_status = 'Pending'";
                                                 $result = mysqli_query($link, $query);
 
                                                 while ($row = mysqli_fetch_assoc($result)) {
-                                                    
                                                     $userid = $row['userid'];
 
                                                     // Fetch username
@@ -87,61 +87,54 @@ if (!check_login_user_universal($link)) {
                                                     $stmtUsername->close();
 
                                                     $status = $row['order_status'];
-
                                                     $order_id = $row['order_id'];
                                                     $transaction_number = $row['transaction_number'];
-
-                                                    
-
                                                     $createdAt = date('d M Y', strtotime($row['created_at']));
 
-                                                    // check if the order is pending for cancellation
-                                                    $queryCheckCancellation = "SELECT status FROM cancellation_request WHERE order_id = ?";
-                                                    $stmtqueryCheckCancellation = $link->prepare($queryCheckCancellation);
+                                                    // Check if there is a pending cancellation request for this order
+                                                    $checkCancellationQuery = "SELECT * FROM cancellation_request WHERE order_id = ? AND status = 0";
+                                                    $stmtCancellation = $link->prepare($checkCancellationQuery);
+                                                    $stmtCancellation->bind_param("i", $order_id);
+                                                    $stmtCancellation->execute();
+                                                    $resultCancellation = $stmtCancellation->get_result();
+                                                    $cancellationExists = $resultCancellation->num_rows > 0;
+                                                    $stmtCancellation->close();
 
-                                                  
-                                                    $stmtqueryCheckCancellation->bind_param("i", $order_id); 
-                                                
-                                                    $stmtqueryCheckCancellation->execute();
-                                                
-                                                    // Fetch the result
-                                                    $stmtqueryCheckCancellation->bind_result($cancel_order);
-                                                    $stmtqueryCheckCancellation->fetch();
-                                                    if (!isset($cancel_order)) {
-                                                        $cancel_order = 3;
+                                                    if ($status === 'Pending') {
+                                                        $statusLabel = '<label class="badge badge-warning">Pending</label>';
+                                                    } else {
+                                                        $statusLabel = $status;
                                                     }
-
-                                                    echo $cancel_order;
-
-                                                    if ($status === 'Pending' && $cancel_order === 0) {
-                                                        $status = '<label class="badge badge-danger">Cancellation</label>';
-                                                    } else if ($status === 'Pending') {
-                                                        $status = '<label class="badge badge-warning">Pending</label>';
-                                                    }
-
-
 
 
                                                     echo "<tr>
-                                                        <td>{$row['order_id']}</td>
-                                                        <td>{$row['transaction_number']}</td>
-                                                        <td>{$username}</td>
-                                                        <td style='color: green;'>₱" . number_format($row['total_amount'], 2, '.', ',') . "</td>
-                                                        <td>{$createdAt}</td>
-                                                        <td>{$status}</td>
-                                                        <td>
-                                                            <button type='button' data-txn='{$row['transaction_number']}' class='view-order btn btn-primary btn-md'><i class='fas fa-shopping-cart'></i></button>
-                                                            <button type='button' data-userid='{$row['userid']}' class='view-user btn btn-info btn-md'><i class='fas fa-user'></i></button>
-                                                            <button type='button' data-userid='{$row['userid']}' class='email-user btn btn-success btn-md'><i class='fas fa-envelope'></i></button>
-                                                            <button type='button' data-order_id='{$row['order_id']}' class='proof-payment btn btn-info btn-md'><i class='fas fa-file-invoice-dollar'></i></button>
-                                                        </td>
-                                                    </tr>";
-                                                    $stmtqueryCheckCancellation->close();
+            <td>{$order_id}</td>
+            <td>{$transaction_number}</td>
+            <td>{$username}</td>
+            <td style='color: green;'>₱" . number_format($row['total_amount'], 2, '.', ',') . "</td>
+            <td>{$createdAt}</td>
+            <td>";
+                                                    if (!$cancellationExists) {
+                                                        echo $statusLabel;
+                                                    } else {
+                                                        echo "<label class='badge badge-danger'>Cancellation</label>";
+                                                    }
+
+                                                   echo "</td>
+            <td>
+                <button type='button' data-txn='{$transaction_number}' class='view-order btn btn-primary btn-md'><i class='fas fa-shopping-cart'></i></button>
+                <button type='button' data-userid='{$userid}' class='view-user btn btn-info btn-md'><i class='fas fa-user'></i></button>
+                <button type='button' data-userid='{$userid}' class='email-user btn btn-success btn-md'><i class='fas fa-envelope'></i></button>
+                <button type='button' data-order_id='{$order_id}' class='proof-payment btn btn-info btn-md'><i class='fas fa-file-invoice-dollar'></i></button>
+            </td>
+        </tr>";
                                                 }
 
                                                 mysqli_close($link);
                                                 ?>
                                             </tbody>
+
+
                                         </table>
                                     </div>
                                 </div>
@@ -192,20 +185,20 @@ if (!check_login_user_universal($link)) {
 
 
 <!-- Modal for cart list -->
-<div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="ModalModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Cart</h5>
-                <button type="button" class="close" id="close-btn" data-dismiss="modal">&times;</button>
-            </div>
-            <div class="ordermodalbody modal-body">
+    <div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="ModalModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Cart</h5>
+                    <button type="button" class="close" id="close-btn" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="ordermodalbody modal-body">
 
-                <!-- Content will be loaded here from edit-temp-question.php -->
+                    <!-- Content will be loaded here from edit-temp-question.php -->
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 
 <!-- proof of payment -->

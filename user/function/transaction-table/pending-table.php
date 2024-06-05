@@ -71,7 +71,11 @@
 
 					<script>
 						document.addEventListener('DOMContentLoaded', (event) => {
-							document.querySelectorAll('.cancel_request').forEach(button => {
+
+							var cancelButtons = document.querySelectorAll('.cancel_request');
+							// Loop through each cancel button
+							cancelButtons.forEach(function(button) {
+								// Add event listener to each cancel button
 								button.addEventListener('click', function() {
 									if (confirm('Cancel this order?')) {
 										var orderId = this.getAttribute('data-order_id');

@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if ($resultCheck->num_rows > 0) {
         // Order ID exists in cancellation_request table, update the status to 3
-        $updateCancellationQuery = "UPDATE cancellation_request SET status = 'Rejected' WHERE order_id = ?";
+        $updateCancellationQuery = "UPDATE cancellation_request SET status = 'Approved' WHERE order_id = ?";
         $stmtUpdateCancellation = $link->prepare($updateCancellationQuery);
         $stmtUpdateCancellation->bind_param("i", $order_id);
         $stmtUpdateCancellation->execute();
@@ -30,14 +30,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmtCheck->close();
 
     // Update the order status to 'Confirmed'
-    $updateOrderQuery = "UPDATE orders SET order_status = 'Confirmed' WHERE order_id = ?";
+    $updateOrderQuery = "UPDATE orders SET order_status = 'Cancelled' WHERE order_id = ?";
     $stmtUpdateOrder = $link->prepare($updateOrderQuery);
     $stmtUpdateOrder->bind_param("i", $order_id);
 
     if ($stmtUpdateOrder->execute()) {
-        echo json_encode(['success' => true, 'message' => 'Order confirmed successfully. Please communicate with the buyer about the shipping method']);
+        echo json_encode(['success' => true, 'message' => 'Order has been successfully cancelled.']);
     } else {
-        echo json_encode(['success' => false, 'message' => 'Failed to confirm the order.']);
+        echo json_encode(['success' => false, 'message' => 'Failed to cancel the order.']);
     }
 
     $stmtUpdateOrder->close();

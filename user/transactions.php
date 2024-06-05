@@ -33,7 +33,7 @@ if (!check_login_user_universal($link)) {
 
     <?php
 
-    // include 'html/pre-loader.html';
+    include 'html/pre-loader.html';
     include("navbar.php");
 
     ?>
@@ -253,23 +253,7 @@ if (!check_login_user_universal($link)) {
 
 
 
-<script>
-    document.addEventListener('DOMContentLoaded', (event) => {
-        // Get all buttons with class 'cancel_request'
-        var cancelButtons = document.querySelectorAll('.cancel_request');
-        // Loop through each cancel button
-        cancelButtons.forEach(function(button) {
-            // Add event listener to each cancel button
-            button.addEventListener('click', function() {
-                if (confirm('Cancel this order?')) {
-                    var orderId = this.getAttribute('data-order_id');
-                    // Redirect to the cancellation page with the order ID
-                    window.location.href = 'cancellation.php?order_id=' + orderId;
-                }
-            });
-        });
-    });
-</script>
+
 
 
 </body>

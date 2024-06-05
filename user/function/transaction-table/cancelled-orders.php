@@ -39,23 +39,26 @@
                                 $transaction_number = $row['transaction_number'];
                                 $createdAt = date('d M Y', strtotime($row['created_at']));
 
-                                if ($status === 'Cancelled') {
+                                if ($cancel_status === 'Approved') {
                                     $statusLabel = '<label class="badge badge-success">Cancelled</label>';
-                                } else if ($cancel_status === 3) {
+                                    $refundedAmount = "₱" . number_format($row['total_amount'], 2, '.', ',') . "";
+                                } else if ($cancel_status === 'Rejected') {
                                     $statusLabel = '<label class="badge badge-danger">Rejected</label>';
-                                } else {
+                                    $refundedAmount = "<span style='color: red;'>₱0.00</span>";
+                                } else if ($cancel_status === 'Pending') {  
                                     $statusLabel = '<label class="badge badge-warning">' . $status . '</label>';
+                                    $refundedAmount = "₱" . number_format($row['total_amount'], 2, '.', ',') . "";
                                 }
 
-                                echo "<tr>
-                <td data-label='Transaction #'>{$transaction_number}</td>
-                <td data-label='To pay' style='color: green;'>₱" . number_format($row['total_amount'], 2, '.', ',') . "</td>
-                <td data-label='Date Ordered'>{$createdAt}</td>
-                <td data-label='Status'>{$statusLabel}</td>
-                <td data-label='Actions'>
-                    <button type='button' data-txn='{$transaction_number}' class='view-order btn btn-primary btn-md'><i class='fas fa-shopping-cart'></i></button>
-                </td>
-            </tr>";
+                                                echo "<tr>
+                                <td data-label='Transaction #'>{$transaction_number}</td>
+                                <td data-label='To pay' style='color: green;'>{$refundedAmount}</td>
+                                <td data-label='Date Ordered'>{$createdAt}</td>
+                                <td data-label='Status'>{$statusLabel}</td>
+                                <td data-label='Actions'>
+                                    <button type='button' data-txn='{$transaction_number}' class='view-order btn btn-primary btn-md'><i class='fas fa-shopping-cart'></i></button>
+                                </td>
+                            </tr>";
                             }
 
                             $stmtOrder->close();

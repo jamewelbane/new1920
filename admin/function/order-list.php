@@ -2,6 +2,7 @@
 
 require_once("../../database/connection.php");
 
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Get product_id from POST data
     $txn = $_POST['txn'];
@@ -56,19 +57,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     echo '</tbody>';
     echo '</table>';
 
+
+} else {
+    echo "Invalid request.";
+}
 ?>
-    <script>
+
+<script>
         $(document).ready(function() {
             $('#orderListTable').DataTable({
-                "lengthChange": false,
+                "lengthChange": true,
                 "searching": false
             });
 
 
         });
     </script>
-<?php
-} else {
-    echo "Invalid request.";
-}
-?>

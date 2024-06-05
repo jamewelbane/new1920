@@ -39,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmtqueryCheckCancellation->bind_result($cancel_order);
     $stmtqueryCheckCancellation->fetch();
     if (!isset($cancel_order)) {
-        $cancel_order = 3; // not 1 or 0
+        $cancel_order = '';
         $conf_message = "Confirm the order? Make sure you double check the payment";
     }
 
@@ -66,7 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div style="text-align: center; margin-top: 10px;">
             <button data-order_id="<?php echo htmlspecialchars($order_id); ?>" id="confirm_order" class="btn btn-primary btn-fw">Confirm</button>
             <?php
-            if ($cancel_order === 0) {
+            if ($cancel_order === 'Pending') {
             ?>
                 <button data-order_id="<?php echo htmlspecialchars($order_id); ?>"id="approve_cancel" class="btn btn-danger btn-fw">Approve Cancellation</button>
             <?php
@@ -114,7 +114,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             formData.append('order_id', order_id);
 
             // Proceed with order confirmation
-            fetch('function/order-confirm.php', {
+            fetch('function/cancellation-approval.php', {
                     method: 'POST',
                     body: formData
                 })
@@ -129,5 +129,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     });
 </script>
+
+
+
 
 </html>
