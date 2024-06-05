@@ -1,6 +1,6 @@
 <?php
 // Include PHPMailer autoloader
-require '../../vendor/autoload.php';
+require '../../../vendor/autoload.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
@@ -36,11 +36,11 @@ try {
     $mail->setFrom('noreply@butingshs.com', 'Leviathan');
 
     // Recipient's email address
-    $mail->addAddress('bekora2019@ociun.com', 'Test');
+    $mail->addAddress('cemeyit860@hutov.com', 'Test');
 
     // Email subject and body
     $mail->Subject = 'Test Email from PHPMailer';
-    $mail->Body    = 'This is a test email sent from PHPMailer using Hostinger SMTP.';
+    $mail->Body    = 'This is a test email sent from PHPMailer using test-mail.php.';
 
     // Send the email
     $mail->send();

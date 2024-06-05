@@ -22,6 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
     // Display inventory data with DataTables
+    echo '<div class="table-responsive">';
     echo '<table id="orderListTable" class="table">';
     echo '<thead>';
     echo '<tr>';
@@ -56,6 +57,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     echo '</tbody>';
     echo '</table>';
+    echo '</div>';
 
 
 } else {

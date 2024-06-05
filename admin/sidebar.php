@@ -49,6 +49,7 @@
           <li class="nav-item"> <a class="nav-link" href="orders-pending">Pending</a></li>
           <li class="nav-item"> <a class="nav-link" href="orders-confirmed">Confirmed</a></li>
           <li class="nav-item"> <a class="nav-link" href="orders-completed">Completed</a></li>
+          <li class="nav-item"> <a class="nav-link" href="orders-cancelled">Cancelled</a></li>
         </ul>
       </div>
     </li>
