@@ -25,31 +25,20 @@
                             </button>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary">Login</button>
-                    <button type="button" class="btn btn-primary" onclick="window.location.href='register'">Register</button>
+                    <button type="submit" class="btn btn-primary" style="margin-bottom: 10px;">Login</button>
+                  
+                    <!-- <button type="button" class="btn btn-primary" onclick="window.location.href='register'">Register</button> -->
+                    
 
                 </form>
+                <div class="modal-footer">
+                    <span>Don't have an account? <a href="#" id="signupLink" data-toggle="modal" data-target="#signupModal">Sign up</a></span>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 
-<script>
-    // view and hide password
-function togglePasswordVisibility(fieldId, iconId) {
-  var passwordField = document.getElementById(fieldId);
-  var passwordToggleIcon = document.getElementById(iconId);
 
-  if (passwordField.type === "password") {
-    passwordField.type = "text";
-    passwordToggleIcon.classList.remove("fa-eye");
-    passwordToggleIcon.classList.add("fa-eye-slash");
-  } else {
-    passwordField.type = "password";
-    passwordToggleIcon.classList.remove("fa-eye-slash");
-    passwordToggleIcon.classList.add("fa-eye");
-  }
-}
 
-</script>

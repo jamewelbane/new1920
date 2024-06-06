@@ -29,11 +29,21 @@ $sizes = mysqli_fetch_all($result_size, MYSQLI_ASSOC);
 <body>
 
     <style>
-        .discount-input {
-            display: none;
-            margin-top: 10px;
+        .form-vertical {
+            display: flex;
+            flex-direction: column;
+            width: 200px;
+            /* Adjust the width as needed */
+        }
+
+        .form-control {
             margin-bottom: 10px;
-            width: 50%;
+            /* Adjust the spacing between elements as needed */
+        }
+
+        .btn-primary {
+            align-self: flex-start;
+            /* Align the button to the start of the form */
         }
     </style>
 
@@ -52,40 +62,40 @@ $sizes = mysqli_fetch_all($result_size, MYSQLI_ASSOC);
 
 
                     <div class="row">
-                    <div class="col-12 grid-margin stretch-card">
-    <div class="card">
-        <div class="card-body">
-            <h4 class="card-title">Sales Report</h4>
-            <p class="card-description">*Use the buttons below to generate sales reports</p>
-            <div class="d-flex justify-content-between">
-                <!-- Button to generate sales report for the previous month -->
-                <button class="btn btn-primary" id="generatePreviousMonthReportBtn">Generate Previous Month Report</button>
+                        <div class="col-12 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">Sales Report</h4>
+                                    <p class="card-description">*Use the buttons below to generate sales reports</p>
 
-                <!-- Form to generate sales report for a specific month -->
-                <form id="specificMonthReportForm" method="GET" action="function/generate_specific_report.php" class="d-flex">
-                    <select class="form-control mr-2" id="monthSelect" name="month">
-                        <option value="01">January</option>
-                        <option value="02">February</option>
-                        <option value="03">March</option>
-                        <option value="04">April</option>
-                        <option value="05">May</option>
-                        <option value="06">June</option>
-                        <option value="07">July</option>
-                        <option value="08">August</option>
-                        <option value="09">September</option>
-                        <option value="10">October</option>
-                        <option value="11">November</option>
-                        <option value="12">December</option>
-                    </select>
-                    <select class="form-control mr-2" id="yearSelect" name="year">
-                        <!-- Add options for years dynamically in JavaScript -->
-                    </select>
-                    <button type="submit" class="btn btn-primary">Generate Specific Month Report</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+                                    <!-- Form to generate sales report for a specific month -->
+                                    <form id="specificMonthReportForm" method="GET" action="function/generate_specific_report.php">
+                                        <div class="d-flex">
+                                            <select class="form-control mr-2" id="monthSelect" name="month">
+                                                <option value="01">January</option>
+                                                <option value="02">February</option>
+                                                <option value="03">March</option>
+                                                <option value="04">April</option>
+                                                <option value="05">May</option>
+                                                <option value="06">June</option>
+                                                <option value="07">July</option>
+                                                <option value="08">August</option>
+                                                <option value="09">September</option>
+                                                <option value="10">October</option>
+                                                <option value="11">November</option>
+                                                <option value="12">December</option>
+                                            </select>
+                                            <select class="form-control mr-2" id="yearSelect" name="year">
+                                                <!-- Add options for years dynamically in JavaScript -->
+                                            </select>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Generate Specific Month Report</button>
+
+                                    </form>
+
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <!-- content-wrapper ends -->
@@ -113,13 +123,7 @@ $sizes = mysqli_fetch_all($result_size, MYSQLI_ASSOC);
                 yearSelect.appendChild(yearOption);
             }
 
-            // Add event listener to the previous month report button
-            const generatePreviousMonthReportBtn = document.getElementById('generatePreviousMonthReportBtn');
-            generatePreviousMonthReportBtn.addEventListener('click', function() {
-                window.location.href = 'function/generate_previous_month_report.php';
-            });
 
-            // The form submission for the specific month report is handled by the form's action attribute
         });
     </script>
 

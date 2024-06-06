@@ -70,41 +70,21 @@ function isEmailExists($link, $email)
     return (mysqli_num_rows($result) > 0);
 }
 
-function isKeypassExist($link, $keyPass)
+
+function isPhoneExists($link, $phone)
 {
-    // Prepare the query to check if the keypass exists
-    $checkQuery = "SELECT * FROM keypass WHERE keypass = ?";
+
+    $checkQuery = "SELECT * FROM user_info WHERE phone_number = ?";
     $stmt = mysqli_prepare($link, $checkQuery);
-    mysqli_stmt_bind_param($stmt, "s", $keyPass);
+    mysqli_stmt_bind_param($stmt, "s", $phone);
     mysqli_stmt_execute($stmt);
+
     $result = mysqli_stmt_get_result($stmt);
 
-    // Check if no rows are returned (keypass does not exist)
-    return (mysqli_num_rows($result) == 0);
-}
-
-
-function isKeypassExpired($link, $keyPass)
-{
-    // Prepare the query to check if the keypass is expired
-    $checkQuery = "SELECT * FROM keypass WHERE keypass = ? AND isExpired = 1";
-    $stmt = mysqli_prepare($link, $checkQuery);
-    mysqli_stmt_bind_param($stmt, "s", $keyPass);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
     return (mysqli_num_rows($result) > 0);
 }
 
-function isKeypassUsed($link, $keyPass)
-{
-    // Prepare the query to check if the keypass is expired
-    $checkQuery = "SELECT * FROM keypass WHERE keypass = ? AND isUsed = 1";
-    $stmt = mysqli_prepare($link, $checkQuery);
-    mysqli_stmt_bind_param($stmt, "s", $keyPass);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-    return (mysqli_num_rows($result) > 0);
-}
+
 
 
 

@@ -16,10 +16,10 @@ if (!check_login_user_universal($link)) {
 <!DOCTYPE html>
 <html lang="en">
 
-<?php 
+<?php
 
-include 'index-resources/head.html'; 
-include 'index-resources/navbar.php'; 
+include 'index-resources/head.html';
+include 'index-resources/navbar.php';
 
 ?>
 <style>
@@ -74,27 +74,27 @@ include 'index-resources/navbar.php';
 	</div>
 	<!-- end hero area -->
 
-	
-	<?php 
-	include 'index-resources/feature-list.php'; 
-	include 'index-resources/new-arival.php'; 
-	include 'index-resources/sale-of-month.php'; 
-	include 'index-resources/testimonial.php'; 
-	include 'index-resources/special-sale-monthly.php'; 
-	include 'index-resources/logo-brand.html'; 
-	include 'index-resources/footer.php'; 
-	include 'index-resources/copyright.html'; 
+
+	<?php
+	include 'index-resources/feature-list.php';
+	include 'index-resources/new-arival.php';
+	include 'index-resources/sale-of-month.php';
+	include 'index-resources/testimonial.php';
+	include 'index-resources/special-sale-monthly.php';
+	include 'index-resources/logo-brand.html';
+	include 'index-resources/footer.php';
+	include 'index-resources/copyright.html';
 
 
-	include 'index-resources/injectables.html'; 
+	include 'index-resources/injectables.html';
 	?>
 
 
-	
-	
 
 
-	
+
+
+
 
 </body>
 <?php
@@ -107,5 +107,30 @@ if ($isLoggedIn === 1) {
 	include("index-resources/modal/admin-login-modal.html");
 }
 ?>
+
+
+<script>
+	$(document).ready(function() {
+		$('#signupLink').on('click', function(event) {
+			event.preventDefault();
+			$('#loginModal').modal('hide');
+			$('#signupModal').modal('show');
+		});
+	});
+</script>
+
+
+<script>
+	$(document).ready(function() {
+		$('#loginLink').on('click', function() {
+			event.preventDefault();
+			$('#loginModal').modal('show');
+			$('#signupModal').modal('hide');
+
+		});
+	});
+</script>
+
+<script src="assets/js/sign-up.js"></script>
 
 </html>
