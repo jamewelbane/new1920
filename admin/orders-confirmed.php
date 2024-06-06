@@ -62,14 +62,11 @@ if (!check_login_user_universal($link)) {
                                             </thead>
                                             <tbody>
                                                 <?php
-
-
                                                 // Fetch orders
                                                 $query = "SELECT * FROM orders WHERE order_status = 'Confirmed'";
                                                 $result = mysqli_query($link, $query);
 
                                                 while ($row = mysqli_fetch_assoc($result)) {
-
                                                     $userid = $row['userid'];
 
                                                     // Fetch username
@@ -94,26 +91,26 @@ if (!check_login_user_universal($link)) {
                                                     }
 
                                                     echo "<tr>
-                                                        <td>{$row['order_id']}</td>
-                                                        <td>{$row['transaction_number']}</td>
-                                                        <td>{$username}</td>
-                                                        <td style='color: green;'>₱" . number_format($row['total_amount'], 2, '.', ',') . "</td>
-                                                        <td>{$createdAt}</td>
-                                                        <td>{$updatedAt}</td>
-                                                        <td>{$status}</td>
-                                                        <td>
-                                                            <button type='button' title='Item list' data-txn='{$row['transaction_number']}' class='view-order btn btn-primary btn-md'><i class='fas fa-shopping-cart'></i></button>
-                                                            <button type='button' title='User info' data-userid='{$row['userid']}' class='view-user btn btn-info btn-md'><i class='fas fa-user'></i></button>
-                                                        
-                                                            <button type='button' title='Proof of Payment' data-order_id='{$row['order_id']}' class='proof-payment btn btn-info btn-md'><i class='fas fa-file-invoice-dollar'></i></button>
-                                                            <button type='button' title='Complete ' data-order_id='{$row['order_id']}' id='complete_order' class='complete_order btn btn-success btn-md'><i class='fas fa-check'></i></button>
-                                                        </td>
-                                                    </tr>";
+            <td>{$row['order_id']}</td>
+            <td>{$row['transaction_number']}</td>
+            <td>{$username}</td>
+            <td style='color: green;'>₱" . number_format($row['total_amount'], 2, '.', ',') . "</td>
+            <td>{$createdAt}</td>
+            <td>{$updatedAt}</td>
+            <td>{$status}</td>
+            <td>
+                <button type='button' title='Item list' data-txn='{$row['transaction_number']}' class='view-order btn btn-primary btn-md'><i class='fas fa-shopping-cart'></i></button>
+                <button type='button' title='User info' data-userid='{$row['userid']}' class='view-user btn btn-info btn-md'><i class='fas fa-user'></i></button>
+                <button type='button' title='Proof of Payment' data-order_id='{$row['order_id']}' class='proof-payment btn btn-info btn-md'><i class='fas fa-file-invoice-dollar'></i></button>
+                <button type='button' title='Complete ' data-order_id='{$row['order_id']}' class='complete_order btn btn-success btn-md'><i class='fas fa-check'></i></button>
+            </td>
+        </tr>";
                                                 }
 
                                                 mysqli_close($link);
                                                 ?>
                                             </tbody>
+
                                         </table>
                                     </div>
                                 </div>
@@ -225,27 +222,29 @@ if (!check_login_user_universal($link)) {
 
 <!-- complete transaction -->
 <script>
-    document.getElementById('complete_order').addEventListener('click', function() {
-        if (confirm('Confirm the order? Make sure you double check the payment')) {
-            var order_id = this.getAttribute('data-order_id');
-            // Create form data
-            var formData = new FormData();
-            formData.append('order_id', order_id);
+    document.querySelectorAll('.complete_order').forEach(function(button) {
+        button.addEventListener('click', function() {
+            if (confirm('Complete the order? Make sure the buyer has received the item before doing this action')) {
+                var order_id = this.getAttribute('data-order_id');
+                // Create form data
+                var formData = new FormData();
+                formData.append('order_id', order_id);
 
-            // Proceed with order completion
-            fetch('function/order-complete.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.message);
-                    if (data.success) {
-                        window.location.href = 'orders-confirmed';
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-        }
+                // Proceed with order completion
+                fetch('function/order-complete.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(data.message);
+                        if (data.success) {
+                            window.location.href = 'orders-confirmed';
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        });
     });
 </script>
 

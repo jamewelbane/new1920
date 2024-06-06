@@ -51,9 +51,6 @@ $total_low_stock = $rowCountsStock['low_stock_item'];
 $total_in_stock = $rowCountsStock['in_stock_item'];
 $total_no_stock = $rowCountsStock['no_stock_item'];
 
-
-
-// Free the result set
 mysqli_free_result($resultCountsStock);
 
 
@@ -325,7 +322,7 @@ $formattedCurrentDayRevenue = number_format($currentDayRevenue, 2, '.', ',');
                       <div class="d-flex align-items-center align-self-start">
                         <h3 class="mb-0"><?= $totalPairsSoldToday ?></h3>
                         <p class="<?= $percentageClass ?> ml-2 mb-0 font-weight-medium"><?= $percentageChangeToday >= 0 ? $PlusMinus : '-' ?><?= $percentageDisplay ?></p>
-  
+
                       </div>
                     </div>
                     <div class="col-3">

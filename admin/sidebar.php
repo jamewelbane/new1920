@@ -80,23 +80,13 @@
       </div>
     </li>
 
-
-
+    
     <li class="nav-item menu-items">
-      <a class="nav-link" href="error-404.html">
+      <a class="nav-link" href="reports">
         <span class="menu-icon">
-          <i class="mdi mdi-email"></i>
+          <i class="mdi mdi-file-chart"></i>
         </span>
-        <span class="menu-title">Settings</span>
-      </a>
-    </li>
-
-    <li class="nav-item menu-items">
-      <a class="nav-link" href="error-404.html">
-        <span class="menu-icon">
-          <i class="mdi mdi-email"></i>
-        </span>
-        <span class="menu-title">Support</span>
+        <span class="menu-title">Reports</span>
       </a>
     </li>
 
