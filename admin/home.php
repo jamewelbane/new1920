@@ -106,13 +106,13 @@ if ($percentageChange > 0) {
   $percentageClass = 'text-success';
   $iconClass2 = 'icon-box-success';
   $iconItem = 'mdi-arrow-top-right';
-  $PlusMinus = '+';
+  $PlusMinusPair = '+';
 } else if ($percentageChange < 0) {
   $percentageClass = 'text-danger';
   $iconClass2 = 'icon-box-danger';
   $iconItem = 'mdi-arrow-bottom-left';
   $percentageChange = abs($percentageChange); // Convert to positive for display
-  $PlusMinus = '-';
+  $PlusMinusPair = '-';
 } else {
   $percentageClass = 'text-muted';
   $iconClass2 = 'icon-box-muted';
@@ -321,7 +321,7 @@ $formattedCurrentDayRevenue = number_format($currentDayRevenue, 2, '.', ',');
                     <div class="col-9">
                       <div class="d-flex align-items-center align-self-start">
                         <h3 class="mb-0"><?= $totalPairsSoldToday ?></h3>
-                        <p class="<?= $percentageClass ?> ml-2 mb-0 font-weight-medium"><?= $percentageChangeToday >= 0 ? $PlusMinus : '-' ?><?= $percentageDisplay ?></p>
+                        <p class="<?= $percentageClass ?> ml-2 mb-0 font-weight-medium"><?= $percentageChangeToday >= 0 ? $PlusMinusPair : $PlusMinusPair ?><?= $percentageDisplay ?></p>
 
                       </div>
                     </div>
