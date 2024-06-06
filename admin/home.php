@@ -86,6 +86,65 @@ while ($rowCompletedTransaction = mysqli_fetch_assoc($resultCompletedTransaction
 
 mysqli_free_result($resultCompletedTransaction);
 
+// get the monthly revenue 
+$currentMonth = date('m');
+$currentYear = date('Y');
+
+
+// Get the previous month and year
+$previousMonth = date('m', strtotime('-1 month'));
+$previousYear = date('Y', strtotime('-1 month'));
+
+// Function to get total revenue for a given month and year
+function getTotalRevenueForMonth($link, $month, $year)
+{
+  $query = "
+        SELECT SUM(total_amount) as total_revenue 
+        FROM orders 
+        WHERE order_status = 'Completed' AND MONTH(updated_at) = ? AND YEAR(updated_at) = ?
+    ";
+  $stmt = mysqli_prepare($link, $query);
+  mysqli_stmt_bind_param($stmt, 'ii', $month, $year);
+  mysqli_stmt_execute($stmt);
+  $result = mysqli_stmt_get_result($stmt);
+
+  $row = mysqli_fetch_assoc($result);
+  $totalRevenue = $row['total_revenue'];
+
+  mysqli_free_result($result);
+  mysqli_stmt_close($stmt);
+
+  return $totalRevenue;
+}
+
+// Get the total revenue for the current month and previous month
+$currentMonthRevenue = getTotalRevenueForMonth($link, $currentMonth, $currentYear);
+$previousMonthRevenue = getTotalRevenueForMonth($link, $previousMonth, $previousYear);
+
+// Format the revenues
+$formattedCurrentMonthRevenue = number_format($currentMonthRevenue, 2, '.', ',');
+$formattedPreviousMonthRevenue = number_format($previousMonthRevenue, 2, '.', ',');
+
+// Calculate the percentage change
+if ($previousMonthRevenue > 0) {
+  $percentageChange = (($currentMonthRevenue - $previousMonthRevenue) / $previousMonthRevenue) * 100;
+} else {
+  $percentageChange = 0;
+}
+
+// Determine the icon and text color based on the percentage change
+if ($percentageChange > 0) {
+  $iconClass = 'icon-box-success';
+  $iconArrow = 'mdi-arrow-top-right';
+  $textColor = 'text-success';
+} else {
+  $iconClass = 'icon-box-danger';
+  $iconArrow = 'mdi-arrow-bottom-left';
+  $textColor = 'text-danger';
+}
+
+
+
 ?>
 
 <body>
@@ -118,7 +177,7 @@ mysqli_free_result($resultCompletedTransaction);
                     </div>
                     <div class="col-3 col-sm-2 col-xl-2 pl-0 text-center">
                       <span>
-                        <a href="https://www.bootstrapdash.com/product/corona-admin-template/" target="_blank" class="btn btn-outline-light btn-rounded get-started-btn">Contact DEV</a>
+                        <a href="#" target="_blank" class="btn btn-outline-light btn-rounded get-started-btn">Contact DEV</a>
                       </span>
                     </div>
                   </div>
@@ -133,17 +192,17 @@ mysqli_free_result($resultCompletedTransaction);
                   <div class="row">
                     <div class="col-9">
                       <div class="d-flex align-items-center align-self-start">
-                        <h3 class="mb-0"><?= $total_in_stock ?></h3>
-                        <p class="text-success ml-2 mb-0 font-weight-medium">pair</p>
+                        <h3 class="mb-0">₱<?= $formattedCurrentMonthRevenue ?></h3>
+                        <p class="<?= $textColor ?> ml-2 mb-0 font-weight-medium"><?= number_format(abs($percentageChange), 2) ?>%</p>
                       </div>
                     </div>
                     <div class="col-3">
-                      <div class="icon icon-box-success ">
-                        <span class="mdi mdi-check-circle-outline"></span>
+                      <div class="icon <?= $iconClass ?>">
+                        <span class="mdi <?= $iconArrow ?> icon-item"></span>
                       </div>
                     </div>
                   </div>
-                  <h6 class="text-muted font-weight-normal">In-stock</h6>
+                  <h6 class="text-muted font-weight-normal">Current Revenue</h6>
                 </div>
               </div>
             </div>
@@ -203,7 +262,7 @@ mysqli_free_result($resultCompletedTransaction);
                       </div>
                     </div>
                   </div>
-                  <h6 class="text-muted font-weight-normal">Sold</h6>
+                  <h6 class="text-muted font-weight-normal">Total sold</h6>
                 </div>
               </div>
             </div>

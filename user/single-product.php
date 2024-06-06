@@ -347,7 +347,12 @@ if (isset($_GET['product_id']) && isset($_GET['token'])) {
 	<div class="product-section mt-150 mb-150">
 		<div class="container">
 			<div class="row">
-
+				<div class="col-lg-8 offset-lg-2 text-center">
+					<div class="section-title">
+						<h3><span class="orange-text">Related</span> Products</h3>
+						<p>Explore our collection of stylish shoes for every occasion, blending comfort, quality, and trendy designs.</p>
+					</div>
+				</div>
 			</div>
 
 			<div class="row product-lists">
