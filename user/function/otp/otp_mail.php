@@ -113,6 +113,9 @@ function send_verification_email($email, $username, $OneTimePassword) {
       $mail->send();
     //   echo 'Email sent successfully';
     ?>
+
+
+
 <script>
     alert("OTP sent via email.");
 </script>

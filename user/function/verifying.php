@@ -5,7 +5,7 @@ session_start();
 require_once("../../database/connection.php");
 include("user-function.php");
 require("otp/otp_mail.php");
-$maskedEmail = "";
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $userid = random_num(5);
     $fullname = htmlspecialchars($_POST["fullname"]);
@@ -14,15 +14,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $address = htmlspecialchars($_POST["address"]);
     $username = htmlspecialchars($_POST["signupusername"]);
     $password = password_hash(htmlspecialchars($_POST["userpass"]), PASSWORD_BCRYPT);
-  
 
-  
-     
-  
-
-
-
-    if (empty($fullname) ||empty($username) || empty($email) || empty($phone) || empty($address) || empty($password)) {
+    if (empty($fullname) || empty($username) || empty($email) || empty($phone) || empty($address) || empty($password)) {
         $errorMessage = "Error. Please complete the form ";
 
         if (empty($fullname)) {
@@ -44,10 +37,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $errorMessage .= "Password ";
         }
 
-
         handleValidationError($errorMessage);
     } else {
-
         if (isUsernameExists($link, $username)) {
             handleValidationError("Username is taken");
         }
@@ -60,29 +51,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             handleValidationError("Phone number already used");
         }
 
-  
-
-
-
         // Generate OTP
         $otp = generateOTP();
 
         // Store OTP in session
         $_SESSION['signup_otp'] = $otp;
 
-
-
-
         if ($otp === null) {
             handleValidationError("Failed to generate an OTP. Contact your admin");
         } else {
             send_verification_email($email, $username, $otp);
         }
-
-
-
-
-
 
         $successValidation1 = "Redirecting for email verification....";
 
@@ -96,11 +75,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       </script>";
     }
 }
-
-
-
-
-
 ?>
 
 
@@ -161,9 +135,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <form id="otpForm" action="#">
             <div>
                 <input style="width: 100%; letter-spacing: 8px;" id="otp" type="text" maxlength="4">
-
             </div>
             <button id="verifyBtn">Submit</button>
+            <button id="requestNewOtpBtn">Request New OTP</button>
         </form>
     </section>
 
@@ -179,7 +153,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     var phone = <?php echo json_encode($phone); ?>;
     var username = <?php echo json_encode($username); ?>;
     var password = <?php echo json_encode($password); ?>;
-   
 </script>
 
 <script>
@@ -193,18 +166,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // Get OTP from input fields
             var otp = $('#otp').val();
-            
-
-            // Log the values to debug
-            console.log("OTP: " + otp);
-            console.log("Fullname: " + fullname);
-            console.log("Address: " + address);
-            console.log("Phone: " + phone);
-            console.log("UserID: " + userid);
-            console.log("Email: " + email);
-            console.log("Username: " + username);
-            console.log("Password: " + password);
-   
 
             // AJAX request to handle OTP verification
             $.ajax({
@@ -228,19 +189,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     if (response === 'success') {
                         // OTP verified successfully
                         alert('OTP verified. Registered Successfully!');
-                        // You can perform further actions here, such as redirecting the user or updating the UI
                         window.location.href = '../../index';
                     } else if (response === 'emptyUsername' || response === 'emptyEmail' || response === 'emptyPassword' || response === 'emptyFullname' || response === 'emptyAddress' || response === 'emptyPhone') {
                         alert('Empty field detected or failure to fetch your submitted information. Please repeat the registration or contact the administrator.');
                         history.back();
                     } else if (response === 'existUsername') {
-                        alert('Username already exist');
+                        alert('Username already exists');
                         history.back();
                     } else if (response === 'existEmail') {
-                        alert('Email already exist');
+                        alert('Email already exists');
                         history.back();
                     } else if (response === 'existPhone') {
-                        alert('Phone already exist');
+                        alert('Phone already exists');
                         history.back();
                     } else {
                         // OTP verification failed
@@ -257,8 +217,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
             });
         });
+
+        $('#requestNewOtpBtn').click(function(event) {
+            event.preventDefault();
+            $.ajax({
+                type: 'POST',
+                url: 'request_new_otp.php',
+                data: {
+                    email: <?php echo json_encode($email); ?>
+                },
+                success: function(response) {
+                    if (response === 'success') {
+                        alert('New OTP has been sent to your email.');
+                    } else {
+                        alert(response);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                    alert('An error occurred while requesting a new OTP. Please try again later.');
+                }
+            });
+        });
     });
 </script>
+
 
 
 
