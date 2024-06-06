@@ -1,99 +1,117 @@
 <?php
 // Include the TCPDF library
 require_once(__DIR__ . '/../../vendor/tcpdf/tcpdf.php');
+
 require_once '../../database/connection.php';
 
-// Get the selected month and year from the URL parameters
-$selectedMonth = $_GET['month'];
-$selectedYear = $_GET['year'];
-
-// Function to get total pairs sold, total revenue, and transaction counts for a given date range
-function getMonthlySalesData($link, $startDate, $endDate)
+// Function to get total pairs sold
+function getTotalPairsSold($link, $dateCondition = '')
 {
-    $query = "SELECT transaction_number, order_status, updated_at FROM orders WHERE DATE(updated_at) BETWEEN ? AND ?";
+    $query = "SELECT transaction_number FROM orders WHERE order_status = 'Completed' $dateCondition";
     $stmt = mysqli_prepare($link, $query);
-    mysqli_stmt_bind_param($stmt, 'ss', $startDate, $endDate);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
 
     $totalPairs = 0;
-    $totalRevenue = 0;
-    $completedTransactions = 0;
-    $canceledTransactions = 0;
-    $detailedTransactions = [];
-
     while ($row = mysqli_fetch_assoc($result)) {
         $transactionNumber = $row['transaction_number'];
-        $updatedAt = $row['updated_at'];
+        $quantityQuery = "SELECT SUM(quantity) AS total_quantity FROM order_list WHERE transaction_number = ?";
+        $stmtQuantity = mysqli_prepare($link, $quantityQuery);
+        mysqli_stmt_bind_param($stmtQuantity, "s", $transactionNumber);
+        mysqli_stmt_execute($stmtQuantity);
+        $resultQuantity = mysqli_stmt_get_result($stmtQuantity);
+        $rowQuantity = mysqli_fetch_assoc($resultQuantity);
+        $totalPairs += $rowQuantity['total_quantity'];
 
-        if ($row['order_status'] == 'Completed') {
-            $completedTransactions++;
-
-            // Calculate total pairs and total revenue for completed transactions
-            $quantityQuery = "SELECT SUM(quantity) AS total_quantity FROM order_list WHERE transaction_number = ?";
-            $stmtQuantity = mysqli_prepare($link, $quantityQuery);
-            mysqli_stmt_bind_param($stmtQuantity, "s", $transactionNumber);
-            mysqli_stmt_execute($stmtQuantity);
-            $resultQuantity = mysqli_stmt_get_result($stmtQuantity);
-            $rowQuantity = mysqli_fetch_assoc($resultQuantity);
-            $totalPairs += $rowQuantity['total_quantity'];
-
-            $revenueQuery = "SELECT SUM(total_amount) AS total_revenue FROM orders WHERE transaction_number = ?";
-            $stmtRevenue = mysqli_prepare($link, $revenueQuery);
-            mysqli_stmt_bind_param($stmtRevenue, "s", $transactionNumber);
-            mysqli_stmt_execute($stmtRevenue);
-            $resultRevenue = mysqli_stmt_get_result($stmtRevenue);
-            $rowRevenue = mysqli_fetch_assoc($resultRevenue);
-            $totalRevenue += $rowRevenue['total_revenue'];
-
-            $detailedTransactions[] = [
-                'date' => $updatedAt,
-                'transaction_number' => $transactionNumber,
-                'pairs_sold' => $rowQuantity['total_quantity'],
-                'revenue' => $rowRevenue['total_revenue']
-            ];
-
-            mysqli_free_result($resultQuantity);
-            mysqli_stmt_close($stmtQuantity);
-            mysqli_free_result($resultRevenue);
-            mysqli_stmt_close($stmtRevenue);
-        } elseif ($row['order_status'] == 'Cancelled') {
-            $canceledTransactions++;
-        }
+        mysqli_free_result($resultQuantity);
+        mysqli_stmt_close($stmtQuantity);
     }
 
     mysqli_free_result($result);
     mysqli_stmt_close($stmt);
 
-    return [
-        'total_pairs' => $totalPairs,
-        'total_revenue' => $totalRevenue,
-        'completed_transactions' => $completedTransactions,
-        'canceled_transactions' => $canceledTransactions,
-        'detailed_transactions' => $detailedTransactions
-    ];
+    return $totalPairs;
 }
 
-// Calculate the date range for the selected month and year
+// Function to get daily sales data
+function getDailySalesData($link, $date)
+{
+  $query = "SELECT COUNT(*) AS completed_transactions, 
+                 (SELECT COUNT(*) FROM orders WHERE order_status = 'Cancelled' AND DATE(updated_at) = ?) AS canceled_transactions,
+                 (SELECT SUM(quantity) FROM order_list WHERE transaction_number IN (SELECT transaction_number FROM orders WHERE DATE(updated_at) = ? AND order_status = 'Completed')) AS pairs_sold,
+                 (SELECT SUM(total_amount) FROM orders WHERE DATE(updated_at) = ? AND order_status = 'Completed') AS earnings
+            FROM orders WHERE DATE(updated_at) = ? AND order_status = 'Completed'";
+  $stmt = mysqli_prepare($link, $query);
+  mysqli_stmt_bind_param($stmt, "ssss", $date, $date, $date, $date);
+  mysqli_stmt_execute($stmt);
+  $result = mysqli_stmt_get_result($stmt);
+  
+  // Check if there are any results before fetching data
+  if (mysqli_num_rows($result) > 0) {
+    $data = mysqli_fetch_assoc($result);
+  } else {
+    $data = [
+      'completed_transactions' => null,
+      'canceled_transactions' => null,
+      'pairs_sold' => null,
+      'earnings' => null,
+    ];
+  }
+
+  mysqli_free_result($result);
+  mysqli_stmt_close($stmt);
+
+  return $data;
+}
+
+// Get the selected month and year
+$selectedMonth = $_GET['month'];
+$selectedYear = $_GET['year'];
+
+// Get the first and last date of the selected month
 $startDate = date('Y-m-01', strtotime("$selectedYear-$selectedMonth-01"));
 $endDate = date('Y-m-t', strtotime("$selectedYear-$selectedMonth-01"));
 
-// Get data for the selected month
-$data = getMonthlySalesData($link, $startDate, $endDate);
-$totalPairsSold = $data['total_pairs'];
-$totalRevenue = $data['total_revenue'];
-$completedTransactions = $data['completed_transactions'];
-$canceledTransactions = $data['canceled_transactions'];
-$detailedTransactions = $data['detailed_transactions'];
+// Get total pairs sold
+$totalPairsSold = getTotalPairsSold($link, "AND DATE(updated_at) >= '$startDate' AND DATE(updated_at) <= '$endDate'");
 
-// Calculate additional statistics
-$totalDays = date('t', strtotime("$selectedYear-$selectedMonth-01"));
-$averageEarningsPerDay = $totalRevenue / $totalDays;
-$averagePairsSoldPerDay = $totalPairsSold / $totalDays;
+// Get total revenue
+$queryTotalRevenue = "SELECT SUM(total_amount) AS total_revenue FROM orders WHERE DATE(updated_at) >= ? AND DATE(updated_at) <= ? AND order_status = 'Completed'";
+$stmtTotalRevenue = mysqli_prepare($link, $queryTotalRevenue);
+mysqli_stmt_bind_param($stmtTotalRevenue, "ss", $startDate, $endDate);
+mysqli_stmt_execute($stmtTotalRevenue);
+$resultTotalRevenue = mysqli_stmt_get_result($stmtTotalRevenue);
+$rowTotalRevenue = mysqli_fetch_assoc($resultTotalRevenue);
+$totalRevenue = $rowTotalRevenue['total_revenue'];
+
+// Calculate average earnings per day
+$diffInDays = (strtotime($endDate) - strtotime($startDate)) / (60 * 60 * 24); // Number of days in the month
+$averageEarningsPerDay = $totalRevenue / $diffInDays;
+
+// Calculate average pairs sold per day
+$averagePairsSoldPerDay = ceil($totalPairsSold / $diffInDays);
+
+// Get total completed transactions
+$queryCompletedTransactions = "SELECT COUNT(*) AS completed_transactions FROM orders WHERE DATE(updated_at) >= ? AND DATE(updated_at) <= ? AND order_status = 'Completed'";
+$stmtCompletedTransactions = mysqli_prepare($link, $queryCompletedTransactions);
+mysqli_stmt_bind_param($stmtCompletedTransactions, "ss", $startDate, $endDate);
+mysqli_stmt_execute($stmtCompletedTransactions);
+$resultCompletedTransactions = mysqli_stmt_get_result($stmtCompletedTransactions);
+$rowCompletedTransactions = mysqli_fetch_assoc($resultCompletedTransactions);
+$completedTransactions = $rowCompletedTransactions['completed_transactions'];
+
+// Get total cancelled transactions
+$queryCanceledTransactions = "SELECT COUNT(*) AS canceled_transactions FROM orders WHERE DATE(updated_at) >= ? AND DATE(updated_at) <= ? AND order_status = 'Cancelled'";
+$stmtCanceledTransactions = mysqli_prepare($link, $queryCanceledTransactions);
+mysqli_stmt_bind_param($stmtCanceledTransactions, "ss", $startDate, $endDate);
+mysqli_stmt_execute($stmtCanceledTransactions);
+$resultCanceledTransactions = mysqli_stmt_get_result($stmtCanceledTransactions);
+$rowCanceledTransactions = mysqli_fetch_assoc($resultCanceledTransactions);
+$canceledTransactions = $rowCanceledTransactions['canceled_transactions'];
 
 // Create a new PDF document
 $pdf = new TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
-
+$pdf->SetFont('dejavusans', '', 10);
 // Set document information
 $pdf->SetCreator('Your Name');
 $pdf->SetAuthor('Your Name');
@@ -101,54 +119,72 @@ $pdf->SetTitle("Sales Report for " . date('F Y', strtotime("$selectedYear-$selec
 $pdf->SetSubject('Sales Report');
 $pdf->SetKeywords('Sales, Report, Selected Month');
 
+
 // Add a page
 $pdf->AddPage();
 
-// Set font to DejaVuSans which supports the Peso symbol
-$pdf->SetFont('dejavusans', '', 12);
 
-    // Add title
-    $pdf->Cell(0, 10, 'Sales Report for ' . date('F Y', strtotime("$selectedYear-$selectedMonth-01")), 0, 1, 'C');
-    $pdf->Ln(10);
 
-    // Add summary data
-    $pdf->Cell(60, 10, 'Total Sold Pairs:', 0, 0);
-    $pdf->Cell(60, 10, $totalPairsSold, 0, 1);
+// Add title
+$pdf->Cell(0, 10, 'Sales Report for ' . date('F Y', strtotime("$selectedYear-$selectedMonth-01")), 0, 1, 'C');
+$pdf->Ln(10);
 
-    $pdf->Cell(60, 10, 'Total Revenue:', 0, 0);
-    $pdf->Cell(60, 10, '₱' . number_format($totalRevenue, 2), 0, 1);
+// Add data to the table
+$pdf->Cell(60, 10, 'Total Pairs Sold:', 0, 0);
+$pdf->Cell(60, 10, $totalPairsSold, 0, 1);
 
-    $pdf->Cell(60, 10, 'Average Earnings Per Day:', 0, 0);
-    $pdf->Cell(60, 10, '₱' . number_format($averageEarningsPerDay, 2), 0, 1);
+$pdf->Cell(60, 10, 'Total Revenue:', 0, 0);
+$pdf->Cell(60, 10, '₱' . number_format($totalRevenue, 2), 0, 1);
 
-    $pdf->Cell(60, 10, 'Average Pairs Sold Per Day:', 0, 0);
-    $pdf->Cell(60, 10, number_format($averagePairsSoldPerDay, 2), 0, 1);
+$pdf->Cell(60, 10, 'Average Earnings Per Day:', 0, 0);
+$pdf->Cell(60, 10, '₱' . number_format($averageEarningsPerDay, 2), 0, 1);
 
-    $pdf->Cell(60, 10, 'Completed Transactions:', 0, 0);
-    $pdf->Cell(60, 10, $completedTransactions, 0, 1);
+$pdf->Cell(60, 10, 'Average Pairs Sold Per Day:', 0, 0);
+$pdf->Cell(60, 10, number_format($averagePairsSoldPerDay), 0, 1);
 
-    $pdf->Cell(60, 10, 'Canceled Transactions:', 0, 0);
-    $pdf->Cell(60, 10, $canceledTransactions, 0, 1);
+$pdf->Cell(60, 10, 'Total Completed Transactions:', 0, 0);
+$pdf->Cell(60, 10, $completedTransactions, 0, 1);
 
-    $pdf->Ln(10); // Add some space before the table
+$pdf->Cell(60, 10, 'Total Cancelled Transactions:', 0, 0);
+$pdf->Cell(60, 10, $canceledTransactions, 0, 1);
 
-    // Add detailed transactions table header
-    $pdf->SetFillColor(240, 240, 240); // Set header background color
-    $pdf->Cell(40, 10, 'Date', 1, 0, 'C', true);
-    $pdf->Cell(50, 10, 'Transaction Number', 1, 0, 'C', true);
-    $pdf->Cell(50, 10, 'Pairs Sold', 1, 0, 'C', true);
-    $pdf->Cell(50, 10, 'Revenue', 1, 1, 'C', true);
+// Add table for daily details
+$pdf->Ln(10);
+$pdf->SetFont('helvetica', 'B', 12);
+$pdf->Cell(0, 10, 'Daily Details', 0, 1, 'C');
+$pdf->SetFont('helvetica', '', 10);
 
-    // Add detailed transactions to the table
-    foreach ($detailedTransactions as $transaction) {
-        $pdf->Cell(40, 10, date('F d, Y', strtotime($transaction['date'])), 1);
-        $pdf->Cell(50, 10, $transaction['transaction_number'], 1);
-        $pdf->Cell(50, 10, $transaction['pairs_sold'], 1);
-        $pdf->Cell(50, 10, '₱' . number_format($transaction['revenue'], 2), 1, 1);
+
+$pdf->SetFillColor(180, 180, 180); // Set fill color for table header
+
+$pdf->Cell(30, 10, 'Date', 1, 0, 'C', true); // Add true as the last argument to Cell to fill the cell with the set fill color
+$pdf->Cell(40, 10, 'Completed Transactions', 1, 0, 'C', true);
+$pdf->Cell(40, 10, 'Cancelled Transactions', 1, 0, 'C', true);
+$pdf->Cell(40, 10, 'Pairs Sold', 1, 0, 'C', true);
+$pdf->Cell(40, 10, 'Earnings', 1, 1, 'C', true);
+$pdf->SetFont('dejavusans', '', 10);
+// Get daily data and add to the table
+$currentDate = $startDate;
+while ($currentDate <= $endDate) {
+    $dailyData = getDailySalesData($link, $currentDate);
+
+    // Check if any data exists for the current date
+    if (array_filter($dailyData)) {
+        $pdf->Cell(30, 10, $currentDate, 1, 0, 'C');
+        $pdf->Cell(40, 10, $dailyData['completed_transactions'] ?? '-', 1, 0, 'C');
+        $pdf->Cell(40, 10, $dailyData['canceled_transactions'] ?? '-', 1, 0, 'C');
+        $pdf->Cell(40, 10, $dailyData['pairs_sold'] ?? '-', 1, 0, 'C');
+        $pdf->Cell(40, 10, "\xE2\x82\xB1" . number_format($dailyData['earnings'] ?? 0, 2), 1, 1, 'C');
     }
 
-    // Output the PDF to the browser
-    $pdf->Output('sales_report_' . date('F_Y', strtotime("$selectedYear-$selectedMonth-01")) . '.pdf', 'I');
+    // Move to the next date
+    $currentDate = date('Y-m-d', strtotime($currentDate . ' +1 day'));
+}
 
-    // Close the connection
-    mysqli_close($link);
+
+// Output the PDF to the browser
+$pdf->Output('sales_report_selected_month.pdf', 'I');
+
+// Close the connection
+mysqli_close($link);
+?>
