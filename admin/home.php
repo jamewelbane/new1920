@@ -15,7 +15,7 @@ if (!check_login_user_universal($link)) {
   $verifiedUID = $_SESSION['admin_id'];
 }
 
-
+$curr_month = date('F');
 $checkQuery = "SELECT 
                     (SELECT COUNT(*) FROM orders WHERE order_status = 'Pending') AS pending_orders, 
                     (SELECT COUNT(*) FROM orders WHERE order_status = 'Confirmed') AS pending_shipment,
@@ -57,41 +57,81 @@ $total_no_stock = $rowCountsStock['no_stock_item'];
 mysqli_free_result($resultCountsStock);
 
 
-// get the total pair sold
+// Function to get total pairs sold
+function getTotalPairsSold($link, $dateCondition = '')
+{
+  $query = "SELECT transaction_number FROM orders WHERE order_status = 'Completed' $dateCondition";
+  $stmt = mysqli_prepare($link, $query);
+  mysqli_stmt_execute($stmt);
+  $result = mysqli_stmt_get_result($stmt);
 
-$completedTransactionQuery = "SELECT transaction_number FROM orders WHERE order_status = 'Completed'";
-$stmtCompletedTransaction = mysqli_prepare($link, $completedTransactionQuery);
-mysqli_stmt_execute($stmtCompletedTransaction);
-$resultCompletedTransaction = mysqli_stmt_get_result($stmtCompletedTransaction);
+  $totalPairs = 0;
+  while ($row = mysqli_fetch_assoc($result)) {
+    $transactionNumber = $row['transaction_number'];
+    $quantityQuery = "SELECT SUM(quantity) AS total_quantity FROM order_list WHERE transaction_number = ?";
+    $stmtQuantity = mysqli_prepare($link, $quantityQuery);
+    mysqli_stmt_bind_param($stmtQuantity, "s", $transactionNumber);
+    mysqli_stmt_execute($stmtQuantity);
+    $resultQuantity = mysqli_stmt_get_result($stmtQuantity);
+    $rowQuantity = mysqli_fetch_assoc($resultQuantity);
+    $totalPairs += $rowQuantity['total_quantity'];
 
+    mysqli_free_result($resultQuantity);
+    mysqli_stmt_close($stmtQuantity);
+  }
 
-$totalPairsSold = 0;
-while ($rowCompletedTransaction = mysqli_fetch_assoc($resultCompletedTransaction)) {
-  $transactionNumber = $rowCompletedTransaction['transaction_number'];
+  mysqli_free_result($result);
+  mysqli_stmt_close($stmt);
 
-
-  $totalQuantityQuery = "SELECT SUM(quantity) AS total_quantity FROM order_list WHERE transaction_number = ?";
-  $stmtTotalQuantity = mysqli_prepare($link, $totalQuantityQuery);
-  mysqli_stmt_bind_param($stmtTotalQuantity, "s", $transactionNumber);
-  mysqli_stmt_execute($stmtTotalQuantity);
-  $resultTotalQuantity = mysqli_stmt_get_result($stmtTotalQuantity);
-  $rowTotalQuantity = mysqli_fetch_assoc($resultTotalQuantity);
-
-
-  $totalPairsSold += $rowTotalQuantity['total_quantity'];
-
-
-  mysqli_free_result($resultTotalQuantity);
+  return $totalPairs;
 }
 
-mysqli_free_result($resultCompletedTransaction);
+// Get the total pairs sold overall
+$totalPairsSold = getTotalPairsSold($link);
+
+// Get the total pairs sold today
+$currentDate = date('Y-m-d');
+$totalPairsSoldToday = getTotalPairsSold($link, "AND DATE(updated_at) = '$currentDate'");
+
+// Get the total pairs sold on the previous day
+$previousDate = date('Y-m-d', strtotime('-1 day'));
+$totalPairsSoldPreviousDay = getTotalPairsSold($link, "AND DATE(updated_at) = '$previousDate'");
+
+// Calculate the percentage change
+if ($totalPairsSoldPreviousDay > 0) {
+  $percentageChange = (($totalPairsSoldToday - $totalPairsSoldPreviousDay) / $totalPairsSoldPreviousDay) * 100;
+} else {
+  $percentageChange = $totalPairsSoldToday > 0 ? 100 : 0; // Handle case when previous day sold is zero
+}
+
+// Determine the icon and percentage display
+if ($percentageChange > 0) {
+  $percentageClass = 'text-success';
+  $iconClass2 = 'icon-box-success';
+  $iconItem = 'mdi-arrow-top-right';
+  $PlusMinus = '+';
+} else if ($percentageChange < 0) {
+  $percentageClass = 'text-danger';
+  $iconClass2 = 'icon-box-danger';
+  $iconItem = 'mdi-arrow-bottom-left';
+  $percentageChange = abs($percentageChange); // Convert to positive for display
+  $PlusMinus = '-';
+} else {
+  $percentageClass = 'text-muted';
+  $iconClass2 = 'icon-box-muted';
+  $iconItem = 'mdi-arrow-right';
+}
+
+$percentageDisplay = number_format($percentageChange, 2) . '%';
+
+
+
+
 
 // get the monthly revenue 
 $currentMonth = date('m');
 $currentYear = date('Y');
 
-
-// Get the previous month and year
 $previousMonth = date('m', strtotime('-1 month'));
 $previousYear = date('Y', strtotime('-1 month'));
 
@@ -125,23 +165,72 @@ $previousMonthRevenue = getTotalRevenueForMonth($link, $previousMonth, $previous
 $formattedCurrentMonthRevenue = number_format($currentMonthRevenue, 2, '.', ',');
 $formattedPreviousMonthRevenue = number_format($previousMonthRevenue, 2, '.', ',');
 
-// Calculate the percentage change
+// Calculate the percentage change for monthly revenue
 if ($previousMonthRevenue > 0) {
   $percentageChange = (($currentMonthRevenue - $previousMonthRevenue) / $previousMonthRevenue) * 100;
 } else {
   $percentageChange = 0;
 }
 
-// Determine the icon and text color based on the percentage change
+// Determine the icon and text color based on the percentage change for monthly revenue
 if ($percentageChange > 0) {
   $iconClass = 'icon-box-success';
   $iconArrow = 'mdi-arrow-top-right';
   $textColor = 'text-success';
+  $PlusMinus = '+';
 } else {
   $iconClass = 'icon-box-danger';
   $iconArrow = 'mdi-arrow-bottom-left';
   $textColor = 'text-danger';
+  $PlusMinus = '-';
 }
+
+// Get the total revenue for the previous day
+$previousDate = date('Y-m-d', strtotime('-1 day'));
+$previousDayRevenue = getTotalRevenueForDay($link, $previousDate);
+
+// Function to get total revenue for a given date
+function getTotalRevenueForDay($link, $date)
+{
+  // Query to get total revenue for the given date
+  $query = "SELECT SUM(total_amount) AS total_revenue FROM orders WHERE DATE(updated_at) = ? AND order_status = 'Completed'";
+  $stmt = mysqli_prepare($link, $query);
+  mysqli_stmt_bind_param($stmt, "s", $date);
+  mysqli_stmt_execute($stmt);
+  $result = mysqli_stmt_get_result($stmt);
+  $row = mysqli_fetch_assoc($result);
+  $totalRevenue = $row['total_revenue'] ?? 0; // If no revenue found, default to 0
+  mysqli_free_result($result);
+  mysqli_stmt_close($stmt);
+
+  return $totalRevenue;
+}
+
+// Get the total revenue for the current day
+$currentDayRevenue = getTotalRevenueForDay($link, date('Y-m-d'));
+
+// Calculate the percentage change for daily revenue
+if ($previousDayRevenue > 0) {
+  $percentageChangeToday = (($currentDayRevenue - $previousDayRevenue) / $previousDayRevenue) * 100;
+} else {
+  $percentageChangeToday = 0;
+}
+
+// Determine the icon and text color based on the percentage change for daily revenue
+if ($percentageChangeToday > 0) {
+  $iconClassToday = 'icon-box-success';
+  $iconArrowToday = 'mdi-arrow-top-right';
+  $textColorToday = 'text-success';
+  $PlusMinusToday = '+';
+} else {
+  $iconClassToday = 'icon-box-danger';
+  $iconArrowToday = 'mdi-arrow-bottom-left';
+  $textColorToday = 'text-danger';
+  $PlusMinusToday = '-';
+}
+
+// Format the current day revenue
+$formattedCurrentDayRevenue = number_format($currentDayRevenue, 2, '.', ',');
 
 
 
@@ -186,14 +275,14 @@ if ($percentageChange > 0) {
             </div>
           </div>
           <div class="row">
-            <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+            <div class="col-xl-4 col-sm-6 grid-margin stretch-card">
               <div class="card">
                 <div class="card-body">
                   <div class="row">
                     <div class="col-9">
                       <div class="d-flex align-items-center align-self-start">
                         <h3 class="mb-0">₱<?= $formattedCurrentMonthRevenue ?></h3>
-                        <p class="<?= $textColor ?> ml-2 mb-0 font-weight-medium"><?= number_format(abs($percentageChange), 2) ?>%</p>
+                        <p class="<?= $textColor ?> ml-2 mb-0 font-weight-medium"><?= $PlusMinus ?><?= number_format(abs($percentageChange), 2) ?>%</p>
                       </div>
                     </div>
                     <div class="col-3">
@@ -202,70 +291,55 @@ if ($percentageChange > 0) {
                       </div>
                     </div>
                   </div>
-                  <h6 class="text-muted font-weight-normal">Current Revenue</h6>
+                  <h6 class="text-muted font-weight-normal"><?= $curr_month ?> Revenue</h6>
                 </div>
               </div>
             </div>
-            <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+
+            <div class="col-xl-4 col-sm-6 grid-margin stretch-card">
               <div class="card">
                 <div class="card-body">
                   <div class="row">
                     <div class="col-9">
                       <div class="d-flex align-items-center align-self-start">
-                        <h3 class="mb-0"><?= $total_low_stock ?></h3>
-                        <p class="text-warning ml-2 mb-0 font-weight-medium">pair</p>
+                        <h3 class="mb-0">₱<?= $formattedCurrentDayRevenue ?></h3>
+                        <p class="<?= $textColorToday ?> ml-2 mb-0 font-weight-medium"><?= $PlusMinusToday ?><?= number_format(abs($percentageChangeToday), 2) ?>%</p>
                       </div>
                     </div>
                     <div class="col-3">
-                      <div class="icon icon-box-warning">
-                        <span class="mdi mdi-alert-circle-outline"></span>
+                      <div class="icon <?= $iconClassToday ?>">
+                        <span class="mdi <?= $iconArrowToday ?> icon-item"></span>
                       </div>
                     </div>
                   </div>
-                  <h6 class="text-muted font-weight-normal">Low-stock</h6>
+                  <h6 class="text-muted font-weight-normal">Today's earning</h6>
                 </div>
               </div>
             </div>
-            <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+
+            <div class="col-xl-4 col-sm-6 grid-margin stretch-card">
               <div class="card">
                 <div class="card-body">
                   <div class="row">
                     <div class="col-9">
                       <div class="d-flex align-items-center align-self-start">
-                        <h3 class="mb-0"><?= $total_no_stock ?></h3>
-                        <p class="text-danger ml-2 mb-0 font-weight-medium">pair</p>
+                        <h3 class="mb-0"><?= $totalPairsSoldToday ?></h3>
+                        <p class="<?= $percentageClass ?> ml-2 mb-0 font-weight-medium"><?= $percentageChangeToday >= 0 ? $PlusMinus : '-' ?><?= $percentageDisplay ?></p>
+  
                       </div>
                     </div>
                     <div class="col-3">
-                      <div class="icon icon-box-danger">
-                        <span class="mdi mdi-close-circle-outline"></span>
+                      <div class="icon <?= $iconClass2 ?>">
+                        <span class="mdi <?= $iconItem ?> icon-item"></span>
                       </div>
                     </div>
                   </div>
-                  <h6 class="text-muted font-weight-normal">Out-of-stock</h6>
+                  <h6 class="text-muted font-weight-normal">Pair sold today</h6>
                 </div>
               </div>
             </div>
-            <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
-              <div class="card">
-                <div class="card-body">
-                  <div class="row">
-                    <div class="col-9">
-                      <div class="d-flex align-items-center align-self-start">
-                        <h3 class="mb-0"><?= $totalPairsSold ?></h3>
-                        <p class="text-success ml-2 mb-0 font-weight-medium">pair</p>
-                      </div>
-                    </div>
-                    <div class="col-3">
-                      <div class="icon icon-box-success ">
-                        <span class="mdi mdi-cart-outline"></span>
-                      </div>
-                    </div>
-                  </div>
-                  <h6 class="text-muted font-weight-normal">Total sold</h6>
-                </div>
-              </div>
-            </div>
+
+
           </div>
           <div class="row">
             <div class="col-md-4 grid-margin stretch-card">
