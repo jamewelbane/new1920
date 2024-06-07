@@ -25,7 +25,6 @@ if (!check_login_user_universal($link)) {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.css">
 <link rel="stylesheet" href="assets/css/cancellation-page.css">
-
 <?php include 'head.html'; ?>
 
 
@@ -250,6 +249,48 @@ if (!check_login_user_universal($link)) {
             });
         });
     </script>
+
+
+<script>
+    $(function() {
+        // Use event delegation for the click event
+        $(document).on('click', '.view-order', function() {
+            var txn = $(this).data('txn');
+            $.ajax({
+                url: 'function/order-list.php',
+                type: 'post',
+                data: {
+                    txn: txn
+                },
+                success: function(response) {
+                    $('.ordermodalbody').html(response);
+                    $('#orderModal').modal('show');
+
+                    $(document).on('click', '#close-btn', function() {
+                        $('#orderModal').modal('hide');
+                    });
+                }
+            });
+        });
+    });
+</script>
+
+
+<!-- Modal for cart list -->
+    <div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="ModalModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Cart</h5>
+                    <button type="button" class="close" id="close-btn" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="ordermodalbody modal-body">
+
+    
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 

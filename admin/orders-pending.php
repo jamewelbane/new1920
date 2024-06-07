@@ -123,8 +123,8 @@ if (!check_login_user_universal($link)) {
                                                    echo "</td>
             <td>
                 <button type='button' data-txn='{$transaction_number}' class='view-order btn btn-primary btn-md'><i class='fas fa-shopping-cart'></i></button>
-                <button type='button' data-userid='{$userid}' class='view-user btn btn-info btn-md'><i class='fas fa-user'></i></button>
-                <button type='button' data-userid='{$userid}' class='email-user btn btn-success btn-md'><i class='fas fa-envelope'></i></button>
+                <button type='button' data-userid='{$userid}' class='view-user btn btn-secondary btn-md'><i class='fas fa-user'></i></button>
+                <button type='button' data-order_id='{$order_id}' class='note-user btn btn-warning btn-md'><i class='mdi mdi-note-text'></i></button>
                 <button type='button' data-order_id='{$order_id}' class='proof-payment btn btn-info btn-md'><i class='fas fa-file-invoice-dollar'></i></button>
             </td>
         </tr>";
@@ -243,6 +243,48 @@ if (!check_login_user_universal($link)) {
     </div>
 </div>
 
+
+<!-- modal for note -->
+<script>
+    $(function() {
+        // Use event delegation for the click event
+        $(document).on('click', '.note-user', function() {
+            var order_id = $(this).data('order_id');
+            $.ajax({
+                url: 'function/user-note.php',
+                type: 'post',
+                data: {
+                    order_id: order_id
+                },
+                success: function(response) {
+                    $('.noteModalBody').html(response);
+                    $('#noteModal').modal('show');
+
+                    $(document).on('click', '#close-btn', function() {
+                        $('#noteModal').modal('hide');
+                    });
+                }
+            });
+        });
+    });
+</script>
+
+
+<!-- Modal for note -->
+<div class="modal fade" id="noteModal" tabindex="-1" role="dialog" aria-labelledby="ModalModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Note</h5>
+                <button type="button" class="close" id="close-btn" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="noteModalBody modal-body">
+
+                <!-- Content will be loaded here from user-note.php -->
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- datatable -->
 
