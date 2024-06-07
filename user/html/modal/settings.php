@@ -1,3 +1,39 @@
+<?php
+
+
+$queryInfo = "SELECT user_id, email, phone_number, address FROM user_info WHERE user_id = ?";
+
+
+$stmtInfo = $link->prepare($queryInfo);
+
+
+$stmtInfo->bind_param("i", $verifiedUID);
+
+
+$stmtInfo->execute();
+
+
+$resultInfo = $stmtInfo->get_result();
+
+
+if ($resultInfo->num_rows > 0) {
+
+    $rowInfo = $resultInfo->fetch_assoc();
+
+    // Extract the values
+    $user_id = $rowInfo['user_id'];
+    $email = $rowInfo['email'];
+    $phone = $rowInfo['phone_number'];
+    $address = $rowInfo['address'];
+} else {
+
+    echo "No user found with the provided ID.";
+}
+
+
+$stmtInfo->close();
+
+?>
 <!-- Modal settings -->
 <div class="modal fade" id="settingsModal" tabindex="-1" role="dialog" aria-labelledby="settingsModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -9,8 +45,15 @@
                 </button>
             </div>
             <div class="modal-body">
-                <!-- Initial Button -->
-                <button type="button" class="btn btn-primary" id="changePasswordBtn">Change Password</button>
+                <!-- main menu button -->
+                <div>
+                    <button type="button" class="btn btn-primary" id="changePasswordBtn">Change Password</button>
+                </div>
+                <div style="margin-top: 10px">
+                    <button type="button" class="btn btn-primary" id="changeInfoBtn">Update Information</button>
+                </div>
+
+
 
                 <!-- Change password form -->
                 <form id="changePasswordForm" action="function/settings/change-password-process.php" method="post" style="display: none;">
@@ -41,6 +84,27 @@
                     <button type="submit" class="btn btn-primary">Change Password</button>
                     <button type="button" class="btn btn-secondary" id="backToSettingsBtn">Back</button>
                 </form>
+
+                <!-- Update info form -->
+                <form id="changeInfoForm" action="function/settings/change-info-process.php" method="post" style="display: none;">
+                    <input type="text" name="user_id" value="<?= $user_id ?>" hidden>
+                    <div class="form-group">
+                        <label class="details">Email</label>
+                        <input type="text" name="email" class="form-control" value="<?= $email ?>">
+                    </div>
+                    <div class="form-group">
+                        <label class="details">Phone number</label>
+                        <input type="text" name="phone" class="form-control" value="<?= $phone ?>">
+                    </div>
+                    <div class="form-group">
+                        <label class="details">Address</label>
+                        <textarea name="address" class="form-control" rows="4"><?= $address ?></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Information</button>
+                    <button type="button" class="btn btn-secondary" id="backToSettingsBtn2">Back</button>
+                </form>
+
+
             </div>
         </div>
     </div>
@@ -83,41 +147,79 @@
 
 
 <script>
-    document.getElementById('changePasswordBtn').addEventListener('click', function() {
-        var changePasswordForm = document.getElementById('changePasswordForm');
+   // Event listener for Change Password button
+document.getElementById('changePasswordBtn').addEventListener('click', function() {
+    var changePasswordForm = document.getElementById('changePasswordForm');
+    var changeInfoBtn = document.getElementById('changeInfoBtn');
 
-        // Add swipe-in animation class
-        changePasswordForm.style.display = 'block';
-        changePasswordForm.classList.remove('swipe-out');
-        changePasswordForm.classList.add('swipe-in');
+    // Add swipe-in animation class
+    changePasswordForm.style.display = 'block';
+    changePasswordForm.classList.remove('swipe-out');
+    changePasswordForm.classList.add('swipe-in');
 
-        // Hide the button with swipe-out animation
-        this.classList.add('swipe-out');
-        this.addEventListener('animationend', function() {
-            this.style.display = 'none';
-        }, {
-            once: true
-        });
+    // Hide the Change Password button
+    this.style.display = 'none';
+
+    // Hide the Update Info button
+    changeInfoBtn.style.display = 'none';
+});
+
+// Back button for Change Password form
+document.getElementById('backToSettingsBtn').addEventListener('click', function() {
+    var changePasswordForm = document.getElementById('changePasswordForm');
+    var changeInfoBtn = document.getElementById('changeInfoBtn');
+
+    // Add swipe-out animation class
+    changePasswordForm.classList.remove('swipe-in');
+    changePasswordForm.classList.add('swipe-out');
+
+    // After animation ends, hide the form and show the buttons
+    changePasswordForm.addEventListener('animationend', function() {
+        changePasswordForm.style.display = 'none';
+        document.getElementById('changePasswordBtn').style.display = 'block';
+        changeInfoBtn.style.display = 'block';
+    }, {
+        once: true
     });
+});
 
-    document.getElementById('backToSettingsBtn').addEventListener('click', function() {
-        var changePasswordForm = document.getElementById('changePasswordForm');
-        var changePasswordBtn = document.getElementById('changePasswordBtn');
+// Event listener for Update Info button
+document.getElementById('changeInfoBtn').addEventListener('click', function() {
+    var changeInfoForm = document.getElementById('changeInfoForm');
+    var changePasswordBtn = document.getElementById('changePasswordBtn');
 
-        // Add swipe-out animation class
-        changePasswordForm.classList.remove('swipe-in');
-        changePasswordForm.classList.add('swipe-out');
+    // Add swipe-in animation class
+    changeInfoForm.style.display = 'block';
+    changeInfoForm.classList.remove('swipe-out');
+    changeInfoForm.classList.add('swipe-in');
 
-        // After animation ends, hide the form and show the button
-        changePasswordForm.addEventListener('animationend', function() {
-            changePasswordForm.style.display = 'none';
-            changePasswordBtn.classList.remove('swipe-out');
-            changePasswordBtn.style.display = 'block';
-            changePasswordBtn.classList.add('swipe-in');
-        }, {
-            once: true
-        });
+    // Hide the Update Info button
+    this.style.display = 'none';
+
+    // Hide the Change Password button
+    changePasswordBtn.style.display = 'none';
+});
+
+// Back button for Update Info form
+document.getElementById('backToSettingsBtn2').addEventListener('click', function() {
+    var changeInfoForm = document.getElementById('changeInfoForm');
+    var changePasswordBtn = document.getElementById('changePasswordBtn');
+
+    // Add swipe-out animation class
+    changeInfoForm.classList.remove('swipe-in');
+    changeInfoForm.classList.add('swipe-out');
+
+    // After animation ends, hide the form and show the buttons
+    changeInfoForm.addEventListener('animationend', function() {
+        changeInfoForm.style.display = 'none';
+        document.getElementById('changeInfoBtn').style.display = 'block';
+        changePasswordBtn.style.display = 'block';
+    }, {
+        once: true
     });
+});
+
+    
 
     document.getElementById('changePasswordForm').addEventListener('submit', function(event) {
         event.preventDefault(); // Prevent the form from submitting normally
@@ -143,11 +245,11 @@
                             if (response.status === 'success') {
                                 // Reset the form if password changed successfully
                                 document.getElementById('changePasswordForm').reset();
-                                // You can also hide the form and display the button again here if needed
+                          
                             }
                         }
                     } else {
-                        // Handle other status codes if necessary
+                  
                     }
                 }
             };
@@ -158,20 +260,38 @@
     });
 
 
-    // Function to toggle password visibility
-    function togglePasswordVisibility(fieldId, iconId) {
-        var passwordField = document.getElementById(fieldId);
-        var passwordToggleIcon = document.getElementById(iconId);
+    // changeinfo ajax
+    document.getElementById('changeInfoForm').addEventListener('submit', function(event) {
+    event.preventDefault(); 
 
-        if (passwordField.type === "password") {
-            passwordField.type = "text";
-            passwordToggleIcon.classList.remove("fa-eye");
-            passwordToggleIcon.classList.add("fa-eye-slash");
-        } else {
-            passwordField.type = "password";
-            passwordToggleIcon.classList.remove("fa-eye-slash");
-            passwordToggleIcon.classList.add("fa-eye");
+    // Get form data
+    var formData = new FormData(this);
+
+    // Send form data via AJAX
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'function/settings/change-info-process.php', true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                // Handle successful response here
+                var response = JSON.parse(xhr.responseText);
+                if (response.status === 'success') {
+                    alert(response.message); 
+                 
+                } else {
+                 
+                    alert(response.message); 
+             
+                }
+            } 
         }
-    }
+    };
+    xhr.send(formData);
+});
+
+
+
+    // Function to toggle password visibility
+   
 </script>
 <script src="../assets/js/sign-up.js"></script>

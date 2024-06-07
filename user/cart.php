@@ -27,7 +27,7 @@ if (mysqli_num_rows($resultcheckCart) > 0) {
 }
 
 mysqli_free_result($resultcheckCart);
-mysqli_close($link);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
