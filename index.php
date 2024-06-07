@@ -80,10 +80,10 @@ include 'index-resources/navbar.php';
 
 	<?php
 	include 'index-resources/feature-list.php';
-	include 'index-resources/new-arival.php';
-	include 'index-resources/sale-of-month.php';
+	// include 'index-resources/new-arival.php';
+	// include 'index-resources/sale-of-month.php';
 	include 'index-resources/testimonial.php';
-	include 'index-resources/special-sale-monthly.php';
+	// include 'index-resources/special-sale-monthly.php';
 	include 'index-resources/logo-brand.html';
 	include 'index-resources/footer.php';
 	include 'index-resources/copyright.html';
