@@ -71,7 +71,7 @@ $sizes = mysqli_fetch_all($result_size, MYSQLI_ASSOC);
                                     <!-- Form to generate sales report for a specific month -->
                                     <form id="specificMonthReportForm" method="GET" action="function/generate_specific_report.php">
                                         <div class="d-flex">
-                                            <select class="form-control mr-2" id="monthSelect" name="month">
+                                            <select class="form-control mr-2" id="monthSelect" name="month" style="color: white;">
                                                 <option value="01">January</option>
                                                 <option value="02">February</option>
                                                 <option value="03">March</option>
@@ -85,7 +85,7 @@ $sizes = mysqli_fetch_all($result_size, MYSQLI_ASSOC);
                                                 <option value="11">November</option>
                                                 <option value="12">December</option>
                                             </select>
-                                            <select class="form-control mr-2" id="yearSelect" name="year">
+                                            <select class="form-control mr-2" id="yearSelect" name="year" style="color: white;">
                                                 <!-- Add options for years dynamically in JavaScript -->
                                             </select>
                                         </div>

@@ -172,7 +172,7 @@ function generateToken($product_id, $secret_key)
 				</div>
 			</div>
 
-			<
+			
 
 			<div class="row product-lists">
 				<?php foreach ($products as $product) : ?>
@@ -260,7 +260,6 @@ function generateToken($product_id, $secret_key)
 	include 'html/logo-brand.html';
 	include 'html/footer.php';
 	include 'html/copyright.html';
-
 
 	include 'injectables.html';
 	?>

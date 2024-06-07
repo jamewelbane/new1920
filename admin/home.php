@@ -263,7 +263,7 @@ $formattedCurrentDayRevenue = number_format($currentDayRevenue, 2, '.', ',');
                     </div>
                     <div class="col-3 col-sm-2 col-xl-2 pl-0 text-center">
                       <span>
-                        <a href="#" target="_blank" class="btn btn-outline-light btn-rounded get-started-btn">Contact DEV</a>
+                        <a href="https://www.facebook.com/jamecer.bane" target="_blank" class="btn btn-outline-light btn-rounded get-started-btn">Contact DEV</a>
                       </span>
                     </div>
                   </div>

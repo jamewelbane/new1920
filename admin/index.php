@@ -50,7 +50,7 @@ if (!check_login_user_universal($link)) {
                 <h3 class="card-title text-left mb-3">Login</h3>
                 <form method="POST" action="function/login-process">
                   <div class="form-group">
-                    <label>Username or email *</label>
+                    <label>Username *</label>
                     <input type="text" class="form-control p_input" style="color: white;" name="adminUsername">
                   </div>
                   <div class="form-group">
@@ -62,7 +62,7 @@ if (!check_login_user_universal($link)) {
                       <label class="form-check-label">
                         <input type="checkbox" class="form-check-input"> Remember me </label>
                     </div>
-                    <a href="#" class="forgot-pass">Forgot password</a>
+            
                   </div>
                   <div class="text-center">
                     <button type="submit" class="btn btn-primary btn-block enter-btn">Login</button>
