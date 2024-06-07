@@ -55,7 +55,7 @@ if (!check_login_user_universal($link)) {
                   </div>
                   <div class="form-group">
                     <label>Password *</label>
-                    <input type="text" class="form-control p_input" style="color: white;" name="adminpass">
+                    <input type="password" class="form-control p_input" style="color: white;" name="adminpass">
                   </div>
                   <div class="form-group d-flex align-items-center justify-content-between">
                     <div class="form-check">

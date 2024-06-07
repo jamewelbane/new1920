@@ -109,27 +109,7 @@ if ($isLoggedIn === 1) {
 ?>
 
 
-<script>
-	$(document).ready(function() {
-		$('#signupLink').on('click', function(event) {
-			event.preventDefault();
-			$('#loginModal').modal('hide');
-			$('#signupModal').modal('show');
-		});
-	});
-</script>
 
-
-<script>
-	$(document).ready(function() {
-		$('#loginLink').on('click', function() {
-			event.preventDefault();
-			$('#loginModal').modal('show');
-			$('#signupModal').modal('hide');
-
-		});
-	});
-</script>
 
 <script src="assets/js/sign-up.js"></script>
 

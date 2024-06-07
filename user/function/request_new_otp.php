@@ -31,14 +31,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["email"])) {
         $_SESSION['last_otp_request_time'] = $currentTime;
 
         // Fetch user details for sending email
-        $username = ''; // Fetch the username from the database if necessary
+        $username = '';
 
-        // Send the new OTP to the user's email
-        if (send_verification_email($email, $username, $newOtp)) {
+        send_verification_email($email, $username, $newOtp);
+
+
+ 
             echo 'success';
-        } else {
-            echo 'success';
-        }
+       
     } else {
         echo 'Failed to generate a new OTP. Please try again.';
     }

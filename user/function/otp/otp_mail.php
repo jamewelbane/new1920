@@ -116,9 +116,7 @@ function send_verification_email($email, $username, $OneTimePassword) {
 
 
 
-<script>
-    alert("OTP sent via email.");
-</script>
+
 
 <?php
     } catch (Exception $e) {

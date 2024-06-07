@@ -21,7 +21,7 @@ try {
     $mail->SMTPAuth   = true;
     
     // SMTP username (your email address)
-    $mail->Username   = 'noreply@butingshs.com';
+    $mail->Username   = 'no-reply@1920snkrs.shop';
     
     // SMTP password
     $mail->Password   = '@Password2024';
@@ -33,10 +33,10 @@ try {
     $mail->Port       = 587;
 
     // Sender's email address
-    $mail->setFrom('noreply@butingshs.com', 'Leviathan');
+    $mail->setFrom('no-reply@1920snkrs.shop', '1920snkrs');
 
     // Recipient's email address
-    $mail->addAddress('cemeyit860@hutov.com', 'Test');
+    $mail->addAddress('tahon53173@cnurbano.com', 'OTP');
 
     // Email subject and body
     $mail->Subject = 'Test Email from PHPMailer';

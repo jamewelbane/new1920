@@ -22,9 +22,17 @@
 
 
 							<li><a href="contact.html">Contact</a></li>
-							<li id="shop"><a href="shop">Shop</a>
-							<li><a>User</a></li>
-							</li>
+							<li id="shop"><a href="shop">Shop</a></li>
+							<?php if ($isLoggedIn === 0) {
+									?>
+								<li><a data-toggle="modal" data-target="#signupModal">Register</a></li>
+							<?php } else { ?>
+
+								<li><a href="">User</a></li>
+
+								<?php } ?>
+							
+							
 							<li>
 								<div class="header-icons">
 									

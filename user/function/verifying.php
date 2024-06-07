@@ -97,7 +97,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
 </head>
-
+<style>
+     #otpForm {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    #otpForm div, #otpForm button, #otpForm #loading {
+        margin-top: 10px;
+    }
+    #loading img {
+        display: block;
+        margin: auto;
+    }
+</style>
 <body>
     <section>
         <div class="title">OTP</div>
@@ -132,18 +145,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="title">Verification Code</div>
         <p>We have sent a verification code
             to your email</p>
-        <form id="otpForm" action="#">
+        <form id="otpForm" action="#" onsubmit="showLoading()">
             <div>
-                <input style="width: 100%; letter-spacing: 8px;" id="otp" type="text" maxlength="4">
+                <input style="width: 80%; letter-spacing: 8px;" id="otp" type="text" maxlength="4">
             </div>
-            <button id="verifyBtn">Submit</button>
-            <button id="requestNewOtpBtn">Request New OTP</button>
+            <button id="verifyBtn" type="submit">Submit</button>
+            <button id="requestNewOtpBtn" onclick="showLoading()" type="button">Request New OTP</button>
+        
+            <div id="loading" style="display: none;">
+                <img style="width: 20%" src="../../index-resources/assets/images/gif/loading-anim.gif" alt="Loading..." />
+            </div>
         </form>
+
     </section>
 
 </body>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    function showLoading() {
+        var loading = document.getElementById('loading');
+
+        // Show the loading animation
+        loading.style.display = 'block';
+
+        setTimeout(function() {       
+            loading.style.display = 'none';
+        }, 3000); 
+    }
+</script>
+
 <script>
     // Set PHP variables as JavaScript variables
     var userid = <?php echo json_encode($userid); ?>;
