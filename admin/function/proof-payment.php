@@ -68,7 +68,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <?php
             if ($cancel_order === 'Pending') {
             ?>
-                <button data-order_id="<?php echo htmlspecialchars($order_id); ?>" id="approve_cancel" class="btn btn-danger btn-fw">Approve Cancellation</button>
+                <button data-order_id="<?php echo htmlspecialchars($order_id); ?>" id="approve_cancel" class="btn btn-danger btn-fw" onclick="showLoading()">Approve Cancellation</button>
             <?php
             }
             ?>

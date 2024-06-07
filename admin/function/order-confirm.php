@@ -104,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </table>
     <p><strong>Total: ' . $totalPriceFormatted .'</strong></p>
     <p>You can track your order by visiting our website or contacting us at +63 9102579678 or support@1920snkrs.shop.</p>
-    <a href="#" class="btn">Track Your Order</a>
+    <a href="1920snkrs.shop/user/transactions" class="btn">Track Your Order</a>
     <p>Thank you for your business!</p>
     <p>Sincerely,</p>
     <p>1920 SNKRS</p>
@@ -134,8 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmtUpdateOrder->bind_param("i", $order_id);
 
     if ($stmtUpdateOrder->execute()) {
-        // Prepare the email body
-       
+    
 
         send_email_user($email, $name, $message, $subject, $body);
         echo json_encode(['success' => true, 'message' => 'Order confirmed successfully. Please communicate with the buyer about the shipping method']);
