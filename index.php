@@ -100,7 +100,7 @@ include 'index-resources/navbar.php';
 <?php
 
 if ($isLoggedIn === 1) {
-	// Code to execute if user is logged in
+	include("index-resources/modal/settings.php");
 } else {
 	include("index-resources/modal/signup-modal.html");
 	include("index-resources/modal/user-login-modal.html");

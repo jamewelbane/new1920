@@ -24,39 +24,39 @@
 								<li><a href="#">Contact</a></li>
 								<li id="shop"><a href="user/shop">Shop</a></li>
 								<?php if ($isLoggedIn === 0) {
-									?>
-								<li><a data-toggle="modal" data-target="#signupModal">Register</a></li>
-							<?php } else { ?>
+								?>
+									<li><a data-toggle="modal" data-target="#signupModal">Register</a></li>
+								<?php } else { ?>
 
-								<li><a href="">User</a></li>
+									<li><a data-toggle="modal" data-target="#settingsModal">User</a></li>
 
 								<?php } ?>
-							<li>
-							<div class="header-icons">
-									
-									<?php if ($isLoggedIn === 1) {
-									?>
-										<a class="mobile-hide shopping-cart" href="user/cart"><i id="cart" class="fas fa-shopping-cart"></i></a>
-										<a class="mobile-hide" href="user/transactions"><i id="transac" class="fas fa-exchange-alt"></i></a>
-										<a class="login-icon" onclick="logoutConfirmation()">
-											<i class="fas fa-sign-out-alt" >
-												<form id="logoutForm" method="POST" action="user/function/logout.php">
-												</form>
-											</i>
-											
-										</a>
-									<?php
-									} else { ?>
-										<a class="mobile-hide login-icon" data-toggle="modal" data-target="#loginModal"><i class="fas fa-user"></i></a>
-										
-									<?php
-									}
-									?>
+								<li>
+									<div class="header-icons">
 
-									<a class="mobile-hide search-bar-icon" href="#"><i class="fas fa-search"></i></a>
+										<?php if ($isLoggedIn === 1) {
+										?>
+											<a class="mobile-hide shopping-cart" href="user/cart"><i id="cart" class="fas fa-shopping-cart"></i></a>
+											<a class="mobile-hide" href="user/transactions"><i id="transac" class="fas fa-exchange-alt"></i></a>
+											<a class="login-icon" onclick="logoutConfirmation()">
+												<i class="fas fa-sign-out-alt">
+													<form id="logoutForm" method="POST" action="user/function/logout.php">
+													</form>
+												</i>
 
-								</div>
-							</li>
+											</a>
+										<?php
+										} else { ?>
+											<a class="mobile-hide login-icon" data-toggle="modal" data-target="#loginModal"><i class="fas fa-user"></i></a>
+
+										<?php
+										}
+										?>
+
+										<a class="mobile-hide search-bar-icon" href="#"><i class="fas fa-search"></i></a>
+
+									</div>
+								</li>
 							</ul>
 						</nav>
 						<?php if ($isLoggedIn === 1) {

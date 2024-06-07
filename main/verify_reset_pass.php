@@ -135,7 +135,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['email'])) {
                 url: 'otp/verify_otp.php',
                 data: {
                     otp: otp,
-                    email: email
+                    email: '<?php echo $email; ?>' // Pass the email from PHP to JavaScript
                 },
                 success: function(response) {
                     // Hide loading animation
@@ -145,7 +145,8 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['email'])) {
                     if (response === 'success') {
                         // OTP verified successfully
                         alert('OTP verified. Redirecting...');
-                        window.location.href = '../new_password.php';
+                        // Redirect to new_password.php with email as query parameter
+                        window.location.href = 'new_password.php?email=<?php echo $email; ?>';
                     } else {
                         // OTP verification failed
                         alert('Invalid OTP! Please try again.');
