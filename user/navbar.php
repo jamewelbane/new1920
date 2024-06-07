@@ -28,7 +28,7 @@
 								<li><a data-toggle="modal" data-target="#signupModal">Register</a></li>
 							<?php } else { ?>
 
-								<li><a href="">User</a></li>
+								<li><a data-toggle="modal" data-target="#settingsModal">User</a></li>
 
 								<?php } ?>
 							
@@ -85,11 +85,12 @@
 <?php
 
 if ($isLoggedIn === 1) {
-	// Code to execute if user is logged in
+	include("html/modal/settings.php");
 } else {
 	include("html/modal/signup-modal.html");
 	include("html/modal/user-login-modal.html");
 	include("html/modal/admin-login-modal.html");
+	
 }
 ?>
 
@@ -104,3 +105,7 @@ if ($isLoggedIn === 1) {
     }
   }
 </script>
+
+
+
+
