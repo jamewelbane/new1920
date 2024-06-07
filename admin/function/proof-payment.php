@@ -64,14 +64,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <?php if ($imgURL) : ?>
         <img src="<?php echo htmlspecialchars($imgURL); ?>" alt="Proof of Payment" style="max-width: 100%; height: auto;">
         <div style="text-align: center; margin-top: 10px;">
-            <button data-order_id="<?php echo htmlspecialchars($order_id); ?>" id="confirm_order" class="btn btn-primary btn-fw">Confirm</button>
+            <button data-order_id="<?php echo htmlspecialchars($order_id); ?>" id="confirm_order" class="btn btn-primary btn-fw" onclick="showLoading()">Confirm</button>
             <?php
             if ($cancel_order === 'Pending') {
             ?>
-                <button data-order_id="<?php echo htmlspecialchars($order_id); ?>"id="approve_cancel" class="btn btn-danger btn-fw">Approve Cancellation</button>
+                <button data-order_id="<?php echo htmlspecialchars($order_id); ?>" id="approve_cancel" class="btn btn-danger btn-fw">Approve Cancellation</button>
             <?php
             }
             ?>
+
+            <center>
+                <div id="loading" style="display: none; width: 20%;">
+                    <img src="../index-resources/assets/images/gif/loading2.gif" style="width: 100%;" alt="Loading..." />
+                </div>
+            </center>
+
         </div>
     <?php else : ?>
         <p>No proof of payment found for this order.</p>
@@ -130,6 +137,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     });
 </script>
 
+<script>
+    function showLoading() {
+        var loading = document.getElementById('loading');
+
+        // Show the loading animation
+        loading.style.display = 'block';
+
+        setTimeout(function() {
+            loading.style.display = 'none';
+        }, 5000);
+    }
+</script>
 
 
 
