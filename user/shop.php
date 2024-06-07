@@ -5,53 +5,63 @@ require("function/check-login.php");
 
 $isLoggedIn = 0;
 if (!check_login_user_universal($link)) {
-
-	$isLoggedIn = 0;
+    $isLoggedIn = 0;
 } else {
-	$verifiedUID = $_SESSION['userid'];
-	$isLoggedIn = 1;
+    $verifiedUID = $_SESSION['userid'];
+    $isLoggedIn = 1;
 }
 
+// Fetch categories
 $query_categories = "SELECT CategoryID, CategoryName FROM category";
 $result_categories = mysqli_query($link, $query_categories);
 $categories = mysqli_fetch_all($result_categories, MYSQLI_ASSOC);
 
+// Check if a search keyword is provided
+$keyword = isset($_GET['keyword']) ? $_GET['keyword'] : '';
 
-$query_products = "SELECT p.product_id, p.prod_name, p.Description, p.Price, p.ImageURL, p.sizes, c.CategoryName, pd.CategoryID, pd.isNew, pd.onDiscount, pd.Discount
-                   FROM products p
-                   INNER JOIN product_data pd ON p.product_id = pd.product_id
-                   INNER JOIN category c ON pd.CategoryID = c.CategoryID";
-
-$result_products = mysqli_query($link, $query_products);
+// Prepare the product query with or without the search keyword
+if ($keyword !== '') {
+    $query_products = "SELECT p.product_id, p.prod_name, p.Description, p.Price, p.ImageURL, p.sizes, c.CategoryName, pd.CategoryID, pd.isNew, pd.onDiscount, pd.Discount
+                       FROM products p
+                       INNER JOIN product_data pd ON p.product_id = pd.product_id
+                       INNER JOIN category c ON pd.CategoryID = c.CategoryID
+                       WHERE p.prod_name LIKE ? OR c.CategoryName LIKE ?";
+    $stmt = $link->prepare($query_products);
+    $searchTerm = "%" . $keyword . "%";
+    $stmt->bind_param("ss", $searchTerm, $searchTerm);
+    $stmt->execute();
+    $result_products = $stmt->get_result();
+} else {
+    $query_products = "SELECT p.product_id, p.prod_name, p.Description, p.Price, p.ImageURL, p.sizes, c.CategoryName, pd.CategoryID, pd.isNew, pd.onDiscount, pd.Discount
+                       FROM products p
+                       INNER JOIN product_data pd ON p.product_id = pd.product_id
+                       INNER JOIN category c ON pd.CategoryID = c.CategoryID";
+    $result_products = mysqli_query($link, $query_products);
+}
 
 // Fetch products and format the price
 $products = [];
 while ($row = mysqli_fetch_assoc($result_products)) {
-	// Format price with comma
-	$row['FormattedPrice'] = '₱' . number_format($row['Price'], 2); // 2 decimal places
+    // Format price with comma
+    $row['FormattedPrice'] = '₱' . number_format($row['Price'], 2); // 2 decimal places
 
+    // Calculate discounted price
+    if ($row['onDiscount']) {
+        $discountedPrice = $row['Price'] - ($row['Price'] * ($row['Discount'] / 100));
+        $row['DiscountedPrice'] = '₱' . number_format($discountedPrice, 2);
+    }
 
-
-
-
-	// Calculate discounted price
-	if ($row['onDiscount']) {
-		$discountedPrice = $row['Price'] - ($row['Price'] * ($row['Discount'] / 100));
-		$row['DiscountedPrice'] = '₱' . number_format($discountedPrice, 2);
-	}
-
-	$products[] = $row;
+    $products[] = $row;
 }
-
 
 $secret_key = 'vS8/yDzI70nsY0kOCcHxew==';
 
 function generateToken($product_id, $secret_key)
 {
-	return hash_hmac('sha256', $product_id, $secret_key);
+    return hash_hmac('sha256', $product_id, $secret_key);
 }
-
 ?>
+
 
 
 
@@ -63,10 +73,10 @@ function generateToken($product_id, $secret_key)
 
 <style>
 	.size-dropdown {
-					margin-bottom: 10px;
+		margin-bottom: 10px;
 
-				}
-				
+	}
+
 	.size-box {
 		display: inline-block;
 		width: 40px;
@@ -118,26 +128,13 @@ function generateToken($product_id, $secret_key)
 
 	include 'html/pre-loader.html';
 	include("navbar.php");
-
+	include 'function/search.html';
 	?>
 
 	<!-- search area -->
-	<div class="search-area">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-12">
-					<span class="close-btn"><i class="fas fa-window-close"></i></span>
-					<div class="search-bar">
-						<div class="search-bar-tablecell">
-							<h3>Search For:</h3>
-							<input type="text" placeholder="Keywords">
-							<button type="submit">Search <i class="fas fa-search"></i></button>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+
+
+
 	<!-- end search arewa -->
 
 	<!-- breadcrumb-section -->
@@ -156,103 +153,94 @@ function generateToken($product_id, $secret_key)
 	<!-- end breadcrumb section -->
 
 	<!-- products -->
-	<div class="product-section mt-150 mb-150">
-		<div class="container">
-			<div class="row">
-				<div class="col-md-12">
-					<div class="product-filters">
-						<ul>
-							<li class="active" data-filter="*">All</li>
-							<?php foreach ($categories as $category) : ?>
-								<li data-filter=".<?= $category['CategoryID'] ?>"><?= $category['CategoryName'] ?></li>
-							<?php endforeach; ?>
-						</ul>
-					</div>
+<div class="product-section mt-150 mb-150">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="product-filters">
+                    <ul>
+                        <li class="active" data-filter="*">All</li>
+                        <?php foreach ($categories as $category) : ?>
+                            <li data-filter=".<?= $category['CategoryID'] ?>"><?= htmlspecialchars($category['CategoryName']) ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            </div>
+        </div>
 
-				</div>
-			</div>
+        <div class="row product-lists">
+            <?php foreach ($products as $product) : ?>
+                <?php
+                $discount = $product['Discount'];
+                $formatted_discount = rtrim(rtrim(number_format($discount, 2), '0'), '.');
 
-			
+                if (strpos($formatted_discount, '.') === false) {
+                    $formatted_discount = rtrim($formatted_discount, '.');
+                }
+                $product_id = $product['product_id'];
+                $token = generateToken($product_id, $secret_key);
+                ?>
+                <div class="col-lg-4 col-md-6 text-center <?= htmlspecialchars($product['CategoryID']) ?>">
+                    <div class="single-product-item">
+                        <?php if ($product['isNew']) : ?>
+                            <span class="new" style="margin-left: 5px">new</span>
+                        <?php endif; ?>
+                        <?php if ($product['onDiscount']) : ?>
+                            <span class="discount" style="margin-left: 25px"><?= htmlspecialchars($formatted_discount) ?>% Off</span>
+                        <?php endif; ?>
+                        <div class="product-image">
+                            <a href="single-product.php?product_id=<?= urlencode($product_id) ?>&token=<?= urlencode($token) ?>"><img src="<?= htmlspecialchars($product['ImageURL']) ?>" alt=""></a>
+                        </div>
+                        <h3><?= htmlspecialchars($product['prod_name']) ?></h3>
+                        <p class="product-price">
+                            <span><?= htmlspecialchars($product['CategoryName']) ?></span>
+                            <?php if ($product['onDiscount']) : ?>
+                                <span class="old-price"><?= htmlspecialchars($product['FormattedPrice']) ?></span>
+                                <?= htmlspecialchars($product['DiscountedPrice']) ?>
+                            <?php else : ?>
+                                <span>&nbsp;</span>
+                                <?= htmlspecialchars($product['FormattedPrice']) ?>
+                            <?php endif; ?>
+                        </p>
+                        <div>
+                            <select class="size-dropdown">
+                                <option value="" selected>Select Size</option>
+                                <?php
+                                // Check if SizesArray exists and is an array
+                                if (isset($product['sizes']) && is_string($product['sizes'])) {
+                                    // Split the string into an array of sizes
+                                    $sizesArray = explode(',', $product['sizes']);
 
-			<div class="row product-lists">
-				<?php foreach ($products as $product) : ?>
-					<?php
-					$discount = $product['Discount'];
-					$formatted_discount = rtrim(rtrim(number_format($discount, 2), '0'), '.');
+                                    // Loop through each size and create an option in the select dropdown
+                                    foreach ($sizesArray as $size) {
+                                        echo "<option value='$size'>$size</option>";
+                                    }
+                                } else {
+                                    // Handle case where Sizes column is not set or not a string
+                                    echo "<option value='' disabled>No sizes available</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
 
-					if (strpos($formatted_discount, '.') === false) {
-						$formatted_discount = rtrim($formatted_discount, '.');
-					}
-					$product_id = $product['product_id'];
-					$token = generateToken($product_id, $secret_key);
-					?>
-					<div class="col-lg-4 col-md-6 text-center <?= htmlspecialchars($product['CategoryID']) ?>">
-						<div class="single-product-item">
-							<?php if ($product['isNew']) : ?>
-								<span class="new" style="margin-left: 5px">new</span>
-							<?php endif; ?>
-							<?php if ($product['onDiscount']) : ?>
-								<span class="discount" style="margin-left: 25px"><?= htmlspecialchars($formatted_discount) ?>% Off</span>
-							<?php endif; ?>
-							<div class="product-image">
-								<a href="single-product.php?product_id=<?= urlencode($product_id) ?>&token=<?= urlencode($token) ?>"><img src="<?= htmlspecialchars($product['ImageURL']) ?>" alt=""></a>
-							</div>
-							<h3><?= htmlspecialchars($product['prod_name']) ?></h3>
-							<p class="product-price">
-								<span><?= htmlspecialchars($product['CategoryName']) ?></span>
-								<?php if ($product['onDiscount']) : ?>
-									<span class="old-price"><?= htmlspecialchars($product['FormattedPrice']) ?></span>
-									<?= htmlspecialchars($product['DiscountedPrice']) ?>
-								<?php else : ?>
-									<span>&nbsp;</span>
-									<?= htmlspecialchars($product['FormattedPrice']) ?>
-								<?php endif; ?>
-							</p>
-							<div>
-								<select class="size-dropdown">
-									<option value="" selected>Select Size</option>
-									<?php
-									// Check if SizesArray exists and is an array
-									if (isset($product['sizes']) && is_string($product['sizes'])) {
-										// Split the string into an array of sizes
-										$sizesArray = explode(',', $product['sizes']);
+                        <a class="cart-btn" data-product-id="<?= $product_id ?>"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
 
-										// Loop through each size and create an option in the select dropdown
-										foreach ($sizesArray as $size) {
-											echo "<option value='$size'>$size</option>";
-										}
-									} else {
-										// Handle case where Sizes column is not set or not a string
-										echo "<option value='' disabled>No sizes available</option>";
-									}
-									?>
-								</select>
-							</div>
-
-							<a class="cart-btn" data-product-id="<?= $product_id ?>"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
-
-						</div>
-					</div>
-				<?php endforeach; ?>
-			</div>
-
-
-
-
-
-			<div class="row">
-				<div class="col-lg-12 text-center">
-					<div class="pagination-wrap">
-						<ul>
-							<!-- Pagination links will be added dynamically -->
-						</ul>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- end products -->
-
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <div class="pagination-wrap">
+                    <ul>
+                        <!-- Pagination links will be added dynamically -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end products -->
 
 
 

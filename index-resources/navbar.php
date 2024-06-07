@@ -18,10 +18,7 @@
 								<li class="current-list-item"><a href="#">Home</a>
 
 								</li>
-								<li><a href="#">About</a></li>
-
-
-								<li><a href="#">Contact</a></li>
+						
 								<li id="shop"><a href="user/shop">Shop</a></li>
 								<?php if ($isLoggedIn === 0) {
 								?>

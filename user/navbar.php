@@ -18,10 +18,7 @@
 							<li><a href="../index">Home</a>
 
 							</li>
-							<li><a href="about.html">About</a></li>
-
-
-							<li><a href="contact.html">Contact</a></li>
+						
 							<li id="shop"><a href="shop">Shop</a></li>
 							<?php if ($isLoggedIn === 0) {
 									?>
