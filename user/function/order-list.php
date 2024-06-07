@@ -26,7 +26,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     echo '<table id="orderListTable" class="orderlist">';
     echo '<thead>';
     echo '<tr>';
-    echo '<th>ProductID</th>';
     echo '<th>Name</th>';
     echo '<th>Size</th>';
     echo '<th>Quantity</th>';
@@ -48,7 +47,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmtProd_name->close();
 
         echo '<tr>';
-        echo '<td>' . $row['product_id'] . '</td>';
         echo '<td>' . $prod_name . '</td>'; // Corrected embedding of $prod_name
         echo '<td>' . $row['prod_size'] . '</td>';
         echo '<td>' . $row['quantity'] . '</td>';
@@ -68,7 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <script>
         $(document).ready(function() {
             $('#orderListTable').DataTable({
-                "lengthChange": true,
+                "lengthChange": false,
                 "searching": false
             });
 
